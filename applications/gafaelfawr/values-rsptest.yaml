@@ -6,7 +6,7 @@ config:
   databaseUrl: "postgresql://gafaelfawr@postgres.postgres/gafaelfawr"
 
   github:
-    clientId: "10172b4db1b67ee31620"
+    clientId: "c4a5727c5788cc2d346e"
 
   # Allow access by GitHub team.
   groupMapping:
