@@ -1,3 +1,7 @@
+tapSchema:
+  image:
+    repository: "lsstsqre/tap-schema-idfdev-tap"
+
 resources:
   requests:
     cpu: 2.0
@@ -8,7 +12,7 @@ resources:
 
 config:
   gcsBucket: "async-results.lsst.codes"
-  gcsBucketUrl: "http://async-results.lsst.codes"
+  gcsBucketUrl: "https://tap-files.lsst.codes"
   jvmMaxHeapSize: "31G"
 
 qserv:

@@ -11,6 +11,9 @@ strimzi-kafka:
       limits:
         cpu: 4
         memory: 8Gi
+  users:
+    replicator:
+      enabled: true
 
 influxdb:
   ingress:
@@ -108,6 +111,18 @@ kafka-connect-manager:
         timestamp: "timestamp"
         connectInfluxDb: "lsst.camera"
         topicsRegex: "lsst.camera.*"
+      lsstverify:
+        enabled: true
+        timestamp: "timestamp"
+        connectInfluxDb: "lsst.verify"
+        topicsRegex: "lsst.verify.*"
+        tags: dataset_tag,band,instrument,skymap,detector,physical_filter,tract,exposure,patch,visit,run
+      lsstlf:
+        enabled: true
+        timestamp: "timestamp"
+        connectInfluxDb: "lsst.lf"
+        topicsRegex: "lsst.lf.*"
+        tags: benchmark_env,module,benchmark_type
 
 kafdrop:
   ingress:
@@ -129,6 +144,8 @@ rest-proxy:
       - lsst.example
       - lsst.rubintv
       - lsst.camera
+      - lsst.verify
+      - lsst.lf
 
 chronograf:
   ingress:

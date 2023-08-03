@@ -1,3 +1,7 @@
+tapSchema:
+  image:
+    repository: "lsstsqre/tap-schema-usdf-prod-tap"
+
 qserv:
   host: "172.24.49.51:4040"
   mock:

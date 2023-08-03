@@ -13,7 +13,6 @@ To learn how to develop applications for Phalanx, see the :doc:`/developers/inde
    :caption: Cluster infrastructure
 
    argo-cd/index
-   argo-workflows/index
    cert-manager/index
    ingress-nginx/index
    gafaelfawr/index
@@ -28,12 +27,12 @@ To learn how to develop applications for Phalanx, see the :doc:`/developers/inde
    datalinker/index
    hips/index
    linters/index
+   livetap/index
    mobu/index
    moneypenny/index
    noteburst/index
    nublado/index
    nublado2/index
-   obstap/index
    portal/index
    semaphore/index
    sherlock/index
@@ -49,9 +48,11 @@ To learn how to develop applications for Phalanx, see the :doc:`/developers/inde
    :maxdepth: 1
    :caption: RSP+
 
+   argo-workflows/index
    alert-stream-broker/index
    exposurelog/index
    narrativelog/index
+   obsloctap/index
    plot-navigator/index
    production-tools/index
    sasquatch/index
@@ -65,5 +66,8 @@ To learn how to develop applications for Phalanx, see the :doc:`/developers/inde
    :maxdepth: 1
    :caption: Roundtable
 
+   giftless/index
    kubernetes-replicator/index
+   monitoring/index
+   ook/index
    squarebot/index

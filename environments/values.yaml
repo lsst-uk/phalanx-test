@@ -30,6 +30,8 @@ exposurelog:
   enabled: false
 gafaelfawr:
   enabled: false
+giftless:
+  enabled: false
 hips:
   enabled: false
 ingress-nginx:
@@ -38,9 +40,13 @@ kubernetes-replicator:
   enabled: false
 linters:
   enabled: false
+livetap:
+  enabled: false
 mobu:
   enabled: false
 moneypenny:
+  enabled: false
+monitoring:
   enabled: false
 narrativelog:
   enabled: false
@@ -50,9 +56,9 @@ nublado:
   enabled: false
 nublado2:
   enabled: false
-obsloctap:
+ook:
   enabled: false
-obstap:
+obsloctap:
   enabled: false
 plot-navigator:
   enabled: false

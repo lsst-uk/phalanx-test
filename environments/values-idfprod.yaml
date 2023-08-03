@@ -27,14 +27,18 @@ mobu:
   enabled: true
 moneypenny:
   enabled: true
+monitoring:
+  enabled: false
 narrativelog:
   enabled: false
 noteburst:
   enabled: false
 nublado:
-  enabled: false
+  enabled: true
 nublado2:
   enabled: true
+ook:
+  enabled: false
 plot-navigator:
   enabled: false
 portal:
@@ -55,6 +59,8 @@ squareone:
   enabled: true
 squash-api:
   enabled: false
+ssotap:
+  enabled: true
 strimzi:
   enabled: false
 strimzi-access-operator:

@@ -16,6 +16,8 @@ exposurelog:
   enabled: false
 gafaelfawr:
   enabled: true
+giftless:
+  enabled: true
 hips:
   enabled: false
 ingress-nginx:
@@ -26,6 +28,8 @@ mobu:
   enabled: false
 moneypenny:
   enabled: false
+monitoring:
+  enabled: true
 narrativelog:
   enabled: false
 noteburst:
@@ -34,6 +38,8 @@ nublado:
   enabled: false
 nublado2:
   enabled: false
+ook:
+  enabled: true
 plot-navigator:
   enabled: false
 portal:
