@@ -18,7 +18,7 @@ IVOA TAP service
 | config.gcsBucketType | string | GCS | GCS bucket type (GCS or S3) |
 | config.gcsBucketUrl | string | None, must be set | Base URL for results stored in GCS bucket |
 | config.jvmMaxHeapSize | string | `"4G"` | Java heap size, which will set the maximum size of the heap. Otherwise Java would determine it based on how much memory is available and black maths. |
-| config.tapSchemaAddress | string | `"tap-schema-db.tap-schema.svc.cluster.local:3306"` | Address to a MySQL database containing TAP schema data |
+| config.tapSchemaAddress | string | `"cadc-tap-schema-db:3306"` | Address to a MySQL database containing TAP schema data |
 | fullnameOverride | string | `"cadc-tap"` | Override the full name for resources (includes the release name) |
 | global.baseUrl | string | Set by Argo CD | Base URL for the environment |
 | global.host | string | Set by Argo CD | Host name for ingress |
@@ -45,6 +45,14 @@ IVOA TAP service
 | podAnnotations | object | `{}` | Annotations for the Gafaelfawr frontend pod |
 | replicaCount | int | `1` | Number of pods to start |
 | resources | object | `{}` | Resource limits and requests for the Gafaelfawr frontend pod |
+| tapSchema.affinity | object | `{}` | Affinity rules for the mock QServ pod |
+| tapSchema.image.pullPolicy | string | `"IfNotPresent"` | Pull policy for the TAP schema image |
+| tapSchema.image.repository | string | `"lsstsqre/tap-schema-mock"` | TAP schema image to ue. This must be overridden by each environment with the TAP schema for that environment. |
+| tapSchema.image.tag | string | `"2.1"` | Tag of TAP schema image |
+| tapSchema.nodeSelector | object | `{}` | Node selection rules for the mock QServ pod |
+| tapSchema.podAnnotations | object | `{}` | Annotations for the mock QServ pod |
+| tapSchema.resources | object | `{}` | Resource limits and requests for the TAP schema database pod |
+| tapSchema.tolerations | list | `[]` | Tolerations for the mock QServ pod |
 | tolerations | list | `[]` | Tolerations for the Gafaelfawr frontend pod |
 | uws.affinity | object | `{}` | Affinity rules for the UWS database pod |
 | uws.image.pullPolicy | string | `"IfNotPresent"` | Pull policy for the UWS database image |

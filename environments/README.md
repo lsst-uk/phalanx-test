@@ -14,19 +14,22 @@
 | exposurelog.enabled | bool | `false` |  |
 | fqdn | string | None, must be set | Fully-qualified domain name where the environment is running |
 | gafaelfawr.enabled | bool | `false` |  |
+| giftless.enabled | bool | `false` |  |
 | hips.enabled | bool | `false` |  |
 | ingress-nginx.enabled | bool | `false` |  |
 | kubernetes-replicator.enabled | bool | `false` |  |
 | linters.enabled | bool | `false` |  |
+| livetap.enabled | bool | `false` |  |
 | mobu.enabled | bool | `false` |  |
 | moneypenny.enabled | bool | `false` |  |
+| monitoring.enabled | bool | `false` |  |
 | narrativelog.enabled | bool | `false` |  |
 | noteburst.enabled | bool | `false` |  |
 | nublado.enabled | bool | `false` |  |
 | nublado2.enabled | bool | `false` |  |
 | obsloctap.enabled | bool | `false` |  |
-| obstap.enabled | bool | `false` |  |
 | onepasswordUuid | string | `"dg5afgiadsffeklfr6jykqymeu"` | UUID of the 1Password item in which to find Vault tokens |
+| ook.enabled | bool | `false` |  |
 | plot-navigator.enabled | bool | `false` |  |
 | portal.enabled | bool | `false` |  |
 | postgres.enabled | bool | `false` |  |

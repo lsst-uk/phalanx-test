@@ -1,3 +1,7 @@
+tapSchema:
+  image:
+    repository: "lsstsqre/tap-schema-usdf-prod-sso"
+
 resources:
   requests:
     cpu: 2.0
@@ -10,15 +14,15 @@ replicaCount: 2
 
 config:
   gcsBucket: "async-results.lsst.codes"
-  gcsBucketUrl: "http://async-results.lsst.codes"
+  gcsBucketUrl: "https://tap-files.lsst.codes"
   jvmMaxHeapSize: "31G"
 
 pg:
   mock:
     enabled: false
-  database: "lsstdb1"
-  host: "usdf-butler.slac.stanford.edu:5432"
-  username: "rubin"
+  database: "dp03_catalogs"
+  host: "usdf-pg-catalogs.slac.stanford.edu:5432"
+  username: "dp03"
 
 uws:
   resources:

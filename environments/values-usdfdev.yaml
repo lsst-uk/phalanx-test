@@ -24,22 +24,28 @@ ingress-nginx:
   enabled: false
 kubernetes-replicator:
   enabled: false
+livetap:
+  enabled: true
 mobu:
   enabled: true
 moneypenny:
   enabled: true
+monitoring:
+  enabled: false
 narrativelog:
   enabled: false
 noteburst:
-  enabled: false
+  enabled: true
 nublado:
   enabled: true
 nublado2:
   enabled: true
 obsloctap:
-  enabled: false
+  enabled: true
 obstap:
   enabled: true
+ook:
+  enabled: false
 plot-navigator:
   enabled: true
 portal:
@@ -54,6 +60,8 @@ semaphore:
   enabled: true
 sherlock:
   enabled: false
+ssotap:
+  enabled: true
 squarebot:
   enabled: false
 squareone:
@@ -75,7 +83,7 @@ telegraf:
 telegraf-ds:
   enabled: false
 times-square:
-  enabled: false
+  enabled: true
 vault-secrets-operator:
   enabled: true
 vo-cutouts:

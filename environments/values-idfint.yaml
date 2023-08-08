@@ -29,6 +29,8 @@ mobu:
   enabled: true
 moneypenny:
   enabled: true
+monitoring:
+  enabled: false
 narrativelog:
   enabled: false
 noteburst:
@@ -37,8 +39,8 @@ nublado:
   enabled: true
 nublado2:
   enabled: true
-obstap:
-  enabled: true
+ook:
+  enabled: false
 plot-navigator:
   enabled: true
 portal:

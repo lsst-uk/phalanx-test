@@ -8,7 +8,7 @@ alert-stream-broker:
 argo-workflows:
   enabled: true
 cachemachine:
-  enabled: true
+  enabled: false
 cert-manager:
   enabled: true
 datalinker:
@@ -26,7 +26,9 @@ kubernetes-replicator:
 mobu:
   enabled: true
 moneypenny:
-  enabled: true
+  enabled: false
+monitoring:
+  enabled: false
 narrativelog:
   enabled: false
 noteburst:
@@ -34,7 +36,9 @@ noteburst:
 nublado:
   enabled: true
 nublado2:
-  enabled: true
+  enabled: false
+ook:
+  enabled: false
 plot-navigator:
   enabled: false
 portal:
@@ -48,6 +52,8 @@ production-tools:
 semaphore:
   enabled: true
 sherlock:
+  enabled: true
+ssotap:
   enabled: true
 squareone:
   enabled: true
