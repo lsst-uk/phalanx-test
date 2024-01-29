@@ -6,7 +6,7 @@ import logging
 import os
 import secrets
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 
 import bcrypt
@@ -334,7 +334,7 @@ class SecretGenerator:
             h = bcrypt.hashpw(
                 new_pw.encode("ascii"), bcrypt.gensalt(rounds=15)
             ).decode("ascii")
-            now_time = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+            now_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
             self._set("argocd", "admin.password", h)
             self._set("argocd", "admin.passwordMtime", now_time)
