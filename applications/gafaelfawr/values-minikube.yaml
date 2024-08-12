@@ -2,9 +2,13 @@
 redis:
   persistence:
     enabled: false
+  resources: {}
+
+resources: {}
 
 config:
   internalDatabase: true
+  updateSchema: true
 
   # Support OpenID Connect clients like Chronograf.
   oidcServer:
@@ -15,7 +19,7 @@ config:
 
   # Allow access by GitHub team.
   groupMapping:
-    "admin:provision":
+    "admin:jupyterlab":
       - github:
           organization: "lsst-sqre"
           team: "square"
@@ -47,8 +51,8 @@ config:
   initialAdmins:
     - "afausti"
     - "athornton"
-    - "cbanek"
+    - "fajpunk"
     - "frossie"
     - "jonathansick"
     - "rra"
-    - "simonkrughoff"
+    - "stvoutsin"

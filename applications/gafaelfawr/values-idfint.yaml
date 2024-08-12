@@ -12,7 +12,6 @@ config:
     clientId: "cilogon:/client_id/6b3f86ecfe74f14afa81b73a76be0868"
     enrollmentUrl: "https://id-int.lsst.cloud/registry/co_petitions/start/coef:10"
     test: true
-    usernameClaim: "username"
 
   ldap:
     url: "ldaps://ldap-test.cilogon.org"
@@ -20,8 +19,11 @@ config:
     groupBaseDn: "ou=groups,o=LSST,o=CO,dc=lsst,dc=org"
     groupObjectClass: "eduMember"
     groupMemberAttr: "hasMember"
+    groupSearchByDn: false
     userBaseDn: "ou=people,o=LSST,o=CO,dc=lsst,dc=org"
     userSearchAttr: "voPersonApplicationUID"
+    uidAttr: null
+    gidAttr: null
     addUserGroup: true
 
   firestore:
@@ -30,6 +32,9 @@ config:
   # Support OpenID Connect clients like Chronograf.
   oidcServer:
     enabled: true
+
+  # Support generating user metadata for CADC authentication code.
+  cadcBaseUuid: "dd5cd3ee-4239-48e4-b0e3-282f2328b9d1"
 
   # User quota settings for services.
   quota:
@@ -40,7 +45,7 @@ config:
 
   # Allow access by GitHub team.
   groupMapping:
-    "admin:provision":
+    "admin:jupyterlab":
       - "g_admins"
     "exec:admin":
       - "g_admins"
@@ -50,12 +55,11 @@ config:
       - "g_users"
     "exec:portal":
       - "g_users"
-    "read:alertdb":
-      - "g_admins"
-      - "g_developers"
     "read:image":
       - "g_users"
     "read:tap":
+      - "g_users"
+    "write:files":
       - "g_users"
     "write:sasquatch":
       - "g_admins"
@@ -63,11 +67,11 @@ config:
   initialAdmins:
     - "adam"
     - "afausti"
-    - "cbanek"
+    - "danfuchs"
     - "frossie"
     - "jsick"
     - "rra"
-    - "simonkrughoff"
+    - "svoutsin"
 
 cloudsql:
   enabled: true

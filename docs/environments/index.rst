@@ -14,6 +14,7 @@ To learn more about operating a Phalanx environment, see the :doc:`/admin/index`
 
    base/index
    ccin2p3/index
+   idfdemo/index
    idfdev/index
    idfint/index
    idfprod/index
@@ -23,6 +24,12 @@ To learn more about operating a Phalanx environment, see the :doc:`/admin/index`
    roundtable-prod/index
    summit/index
    tucson-teststand/index
+   usdf-cm/index
+   usdf-cm-dev/index
    usdfdev/index
+   usdfint/index
    usdfprod/index
+   usdfdev-alert-stream-broker/index
+   usdfdev-prompt-processing/index
+   usdfprod-prompt-processing/index
    usdf-tel-rsp/index

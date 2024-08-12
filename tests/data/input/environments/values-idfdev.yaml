@@ -1,14 +1,15 @@
-environment: idfdev
+name: idfdev
 fqdn: data-dev.lsst.cloud
-vaultUrl: https://vault.lsst.codes/
-vaultPathPrefix: secret/k8s_operator/data-dev.lsst.cloud
-butlerRepositoryIndex: "s3://butler-us-central1-repo-locations/data-dev-repos.yaml"
+appOfAppsName: science-platform
+gcp:
+  projectId: science-platform-dev-7696
+  region: us-central1
+  clusterName: science-platform
+vaultUrl: https://vault.lsst.cloud/
+vaultPathPrefix: secret/phalanx/idfdev
 
-gafaelfawr:
-  enabled: true
-mobu:
-  enabled: true
-nublado:
-  enabled: true
-postgres:
-  enabled: true
+applications:
+  mobu: true
+  nublado: true
+  portal: true
+  postgres: true

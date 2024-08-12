@@ -4,6 +4,9 @@ controller:
   config:
     fileserver:
       enabled: true
+      volumeMounts:
+        - containerPath: "/home"
+          volumeName: "home"
     images:
       source:
         type: "google"
@@ -11,53 +14,34 @@ controller:
         projectId: "rubin-shared-services-71ec"
         repository: "sciplat"
         image: "sciplat-lab"
-      recommendedTag: "recommended"
-      numReleases: 1
-      numWeeklies: 2
-      numDailies: 3
     lab:
       env:
         AUTO_REPO_SPECS: "https://github.com/lsst-sqre/system-test@prod,https://github.com/rubin-dp0/tutorial-notebooks@prod"
         AWS_SHARED_CREDENTIALS_FILE: "/opt/lsst/software/jupyterlab/secrets/aws-credentials.ini"
         PGPASSFILE: "/opt/lsst/software/jupyterlab/secrets/postgres-credentials.txt"
         GOOGLE_APPLICATION_CREDENTIALS: "/opt/lsst/software/jupyterlab/secrets/butler-gcs-idf-creds.json"
-        DAF_BUTLER_REPOSITORY_INDEX: "s3://butler-us-central1-repo-locations/data-int-repos.yaml"
+        DAF_BUTLER_REPOSITORY_INDEX: "https://data-int.lsst.cloud/api/butler/configs/idf-repositories.yaml"
         S3_ENDPOINT_URL: "https://storage.googleapis.com"
-        PANDA_AUTH: oidc
+        IDDS_CONFIG: "/opt/lsst/software/jupyterlab/panda/idds.cfg.client.template"
+        PANDA_AUTH: "oidc"
         PANDA_VERIFY_HOST: "off"
-        PANDA_AUTH_VO: Rubin
-        PANDA_URL_SSL: https://pandaserver-doma.cern.ch:25443/server/panda
-        PANDA_URL: http://pandaserver-doma.cern.ch:25080/server/panda
-        IDDS_CONFIG: /opt/lsst/software/jupyterlab/panda/idds.cfg.client.template
+        PANDA_AUTH_VO: "Rubin"
+        PANDA_BEHIND_REAL_LB: "true"
+        PANDA_URL_SSL: "https://usdf-panda-server.slac.stanford.edu:8443/server/panda"
+        PANDA_URL: "https://usdf-panda-server.slac.stanford.edu:8443/server/panda"
+        PANDACACHE_URL: "https://usdf-panda-server.slac.stanford.edu:8443/server/panda"
+        PANDAMON_URL: "https://usdf-panda-bigmon.slac.stanford.edu:8443/"
         PANDA_CONFIG_ROOT: "~"
-        NO_ACTIVITY_TIMEOUT: "432000"
-        CULL_KERNEL_IDLE_TIMEOUT: "432000"
-        CULL_TERMINAL_INACTIVE_TIMEOUT: "432000"
-
-      sizes:
-        small:
-          cpu: 1.0
-          memory: 4Gi
-        medium:
-          cpu: 2.0
-          memory: 8Gi
-        large:
-          cpu: 4.0
-          memory: 16Gi
-        huge:
-          cpu: 8.0
-          memory: 32Gi
+        CULL_TERMINAL_INACTIVE_TIMEOUT: "432000"  # 5 days
       initContainers:
-        - name: "initdir"
-          image: "ghcr.io/lsst-sqre/initdir:0.0.4"
+        - name: "inithome"
+          image:
+            repository: "ghcr.io/lsst-sqre/nublado-inithome"
+            tag: "6.1.0"
           privileged: true
-          volumes:
+          volumeMounts:
             - containerPath: "/home"
-              mode: "rw"
-              source:
-                serverPath: "/share1/home"
-                server: "10.22.240.130"
-                type: "nfs"
+              volumeName: "home"
       secrets:
         - secretName: "nublado-lab-secret"
           secretKey: "aws-credentials.ini"
@@ -67,38 +51,54 @@ controller:
           secretKey: "butler-hmac-idf-creds.json"
         - secretName: "nublado-lab-secret"
           secretKey: "postgres-credentials.txt"
+      sizes:
+        - size: small
+          cpu: 1.0
+          memory: 4Gi
+        - size: medium
+          cpu: 2.0
+          memory: 8Gi
+        - size: large
+          cpu: 4.0
+          memory: 16Gi
+        - size: huge
+          cpu: 8.0
+          memory: 32Gi
       volumes:
-        - containerPath: "/home"
-          mode: "rw"
+        - name: "home"
           source:
             serverPath: "/share1/home"
             server: "10.22.240.130"
             type: "nfs"
-        - containerPath: "/project"
-          mode: "rw"
+        - name: "project"
           source:
             serverPath: "/share1/project"
             server: "10.22.240.130"
             type: "nfs"
-        - containerPath: "/scratch"
-          mode: "rw"
+        - name: "scratch"
           source:
             serverPath: "/share1/scratch"
             server: "10.22.240.130"
             type: "nfs"
+      volumeMounts:
+        - containerPath: "/home"
+          volumeName: "home"
+        - containerPath: "/project"
+          volumeName: "project"
+        - containerPath: "/scratch"
+          volumeName: "scratch"
 
 jupyterhub:
   hub:
-    config:
-      ServerApp:
-        shutdown_no_activity_timeout: 432000
     db:
-      url: "postgresql://nublado3@postgres.postgres/nublado3"
+      url: "postgresql://nublado@cloud-sql-proxy.nublado/nublado"
+      upgrade: true
 
-  cull:
-    enabled: true
-    users: false
-    removeNamedServers: false
-    timeout: 432000
-    every: 300
-    maxAge: 2160000
+hub:
+  internalDatabase: false
+cloudsql:
+  enabled: true
+  instanceConnectionName: "science-platform-int-dc5d:us-central1:science-platform-int-8f439af2"
+  serviceAccount: "nublado@science-platform-int-dc5d.iam.gserviceaccount.com"
+secrets:
+  templateSecrets: true

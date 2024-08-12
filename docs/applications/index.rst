@@ -6,68 +6,19 @@ Applications are individual *atomic* services that are configured and deployed t
 Each environment can opt whether to deploy an application, and also customize the configuration of the application.
 This section of the documentation describes each Phalanx application.
 
+Applications are divided into several Argo CD projects by type of application.
+These groupings are used for access control in some Phalanx environments.
+When creating a new Phalanx application, you will choose which of these groupings the application fits best into.
+
 To learn how to develop applications for Phalanx, see the :doc:`/developers/index` section.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Cluster infrastructure
+   :maxdepth: 2
 
-   argo-cd/index
-   cert-manager/index
-   ingress-nginx/index
-   gafaelfawr/index
-   postgres/index
-   vault-secrets-operator/index
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Rubin Science Platform
-
-   cachemachine/index
-   datalinker/index
-   hips/index
-   linters/index
-   livetap/index
-   mobu/index
-   moneypenny/index
-   noteburst/index
-   nublado/index
-   nublado2/index
-   portal/index
-   semaphore/index
-   sherlock/index
-   sqlproxy-cross-project/index
-   squareone/index
-   ssotap/index
-   tap/index
-   tap-schema/index
-   times-square/index
-   vo-cutouts/index
-
-.. toctree::
-   :maxdepth: 1
-   :caption: RSP+
-
-   argo-workflows/index
-   alert-stream-broker/index
-   exposurelog/index
-   narrativelog/index
-   obsloctap/index
-   plot-navigator/index
-   production-tools/index
-   sasquatch/index
-   strimzi/index
-   strimzi-access-operator/index
-   strimzi-registry-operator/index
-   telegraf/index
-   telegraf-ds/index
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Roundtable
-
-   giftless/index
-   kubernetes-replicator/index
-   monitoring/index
-   ook/index
-   squarebot/index
+   infrastructure
+   rsp
+   rubin
+   roundtable
+   monitoring
+   prompt
+   telescope

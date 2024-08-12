@@ -1,78 +1,39 @@
-environment: base
-fqdn: base-lsp.lsst.codes
-vaultPathPrefix: secret/k8s_operator/base-lsp.lsst.codes
+name: "base"
+fqdn: "base-lsp.lsst.codes"
+appOfAppsName: "science-platform"
+onepassword:
+  connectUrl: "https://roundtable.lsst.cloud/1password"
+  vaultTitle: "RSP base-lsp.lsst.codes"
+vaultPathPrefix: "secret/phalanx/base"
+namespaceLabels:
+  sasquatch:
+    lsst.io/discover: 'true'
 
-alert-stream-broker:
-  enabled: false
-argo-workflows:
-  enabled: true
-cachemachine:
-  enabled: true
-cert-manager:
-  enabled: true
-datalinker:
-  enabled: false
-exposurelog:
-  enabled: true
-gafaelfawr:
-  enabled: true
-hips:
-  enabled: false
-ingress-nginx:
-  enabled: true
-kubernetes-replicator:
-  enabled: false
-mobu:
-  enabled: false
-moneypenny:
-  enabled: true
-monitoring:
-  enabled: false
-narrativelog:
-  enabled: true
-noteburst:
-  enabled: false
-nublado:
-  enabled: false
-ook:
-  enabled: false
-nublado2:
-  enabled: true
-plot-navigator:
-  enabled: false
-portal:
-  enabled: true
-postgres:
-  enabled: false
-sasquatch:
-  enabled: true
-production-tools:
-  enabled: false
-semaphore:
-  enabled: false
-squarebot:
-  enabled: false
-squareone:
-  enabled: true
-squash-api:
-  enabled: false
-strimzi:
-  enabled: true
-strimzi-access-operator:
-  enabled: false
-strimzi-registry-operator:
-  enabled: false
-tap:
-  enabled: false
-tap-schema:
-  enabled: false
-telegraf:
-  enabled: true
-telegraf-ds:
-  enabled: true
-times-square:
-  enabled: false
-vault-secrets-operator:
-  enabled: true
-vo-cutouts:
-  enabled: false
+applications:
+  argo-workflows: true
+  auxtel: true
+  calsys: true
+  consdb: true
+  control-system-test: true
+  eas: true
+  exposurelog: true
+  love: true
+  mobu: true
+  narrativelog: true
+  nightreport: true
+  nublado: true
+  obssys: true
+  portal: true
+  rubintv: true
+  sasquatch: true
+  simonyitel: true
+  squareone: true
+  strimzi: true
+  telegraf: true
+  telegraf-ds: true
+  uws: true
+
+controlSystem:
+  imageTag: "k0001"
+  siteTag: "base"
+  s3EndpointUrl: "https://s3.ls.lsst.org"

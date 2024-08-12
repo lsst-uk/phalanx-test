@@ -64,18 +64,16 @@ ingress:
   # -- Path prefix where Squarebot is hosted
   path: "/ook"
 
+
+# -- Resource requests and limits for Ook pod
+# @default -- See `values.yaml`
 resources:
-  {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: "1"
+    memory: "256Mi"
+  requests:
+    cpu: "120m"
+    memory: "120Mi"
 
 nodeSelector: {}
 
@@ -101,3 +99,64 @@ config:
   topics:
     # -- Kafka topic name for ingest events
     ingest: "lsst.square-events.ook.ingest"
+
+  algolia:
+    # -- Name of the Algolia index for documents
+    documents_index: "documents_dev"
+
+audit:
+  # -- Enable the audit job
+  enabled: true
+
+  # -- Cron schedule string for ook audit job (UTC)
+  schedule: "15 2 * * *"
+
+  # -- Time (second) to keep a finished job before cleaning up
+  ttlSecondsAfterFinished: 86400
+
+  # -- Reingest missing documents
+  reingest: true
+
+  # -- Resource limits and requests for Ook audit pods
+  resources: {}
+
+  # -- Annotations for Ook audit pods
+  podAnnotations: {}
+
+  # -- Node selection rules for Ook audit pods
+  nodeSelector: {}
+
+  # -- Tolerations for Ook audit pods
+  tolerations: []
+
+  # -- Affinity rules for Ook audit pods
+  affinity: {}
+
+ingestUpdated:
+  # -- Enable the ingest-updated job
+  enabled: false
+
+  # -- Time window to look for updated documents (e.g. 1h, 2d, 3w). This must
+  # be set to a value greater than the cron schedule for the ingest-updated job.
+  window: "2d"
+
+  # -- Cron schedule string for ook audit job (UTC)
+  schedule: "15 3 * * *"
+
+  # -- Time (second) to keep a finished job before cleaning up
+  ttlSecondsAfterFinished: 86400
+
+  # -- Resource limits and requests for Ook audit pods
+  resources: {}
+
+  # -- Annotations for Ook audit pods
+  podAnnotations: {}
+
+  # -- Node selection rules for Ook audit pods
+  nodeSelector: {}
+
+  # -- Tolerations for Ook audit pods
+  tolerations: []
+
+  # -- Affinity rules for Ook audit pods
+  affinity: {}

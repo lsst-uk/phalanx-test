@@ -1,83 +1,32 @@
-environment: idfprod
-fqdn: data.lsst.cloud
-vaultPathPrefix: secret/k8s_operator/data.lsst.cloud
-butlerRepositoryIndex: "s3://butler-us-central1-repo-locations/data-repos.yaml"
+name: "idfprod"
+fqdn: "data.lsst.cloud"
+appOfAppsName: "science-platform"
+butlerServerRepositories:
+  dp01: "https://data.lsst.cloud/api/butler/repo/dp01/butler.yaml"
+  dp02: "https://data.lsst.cloud/api/butler/repo/dp02/butler.yaml"
+gcp:
+  projectId: "science-platform-stable-6994"
+  region: "us-central1"
+  clusterName: "science-platform-stable"
+onepassword:
+  connectUrl: "https://roundtable.lsst.cloud/1password"
+  vaultTitle: "RSP data.lsst.cloud"
+vaultPathPrefix: "secret/phalanx/idfprod"
 
-alert-stream-broker:
-  enabled: false
-argo-workflows:
-  enabled: false
-cachemachine:
-  enabled: true
-cert-manager:
-  enabled: true
-datalinker:
-  enabled: true
-exposurelog:
-  enabled: false
-gafaelfawr:
-  enabled: true
-hips:
-  enabled: true
-ingress-nginx:
-  enabled: true
-kubernetes-replicator:
-  enabled: false
-mobu:
-  enabled: true
-moneypenny:
-  enabled: true
-monitoring:
-  enabled: false
-narrativelog:
-  enabled: false
-noteburst:
-  enabled: false
-nublado:
-  enabled: true
-nublado2:
-  enabled: true
-ook:
-  enabled: false
-plot-navigator:
-  enabled: false
-portal:
-  enabled: true
-postgres:
-  enabled: true
-sasquatch:
-  enabled: false
-production-tools:
-  enabled: false
-semaphore:
-  enabled: true
-sherlock:
-  enabled: true
-squarebot:
-  enabled: false
-squareone:
-  enabled: true
-squash-api:
-  enabled: false
-ssotap:
-  enabled: true
-strimzi:
-  enabled: false
-strimzi-access-operator:
-  enabled: false
-strimzi-registry-operator:
-  enabled: false
-tap:
-  enabled: true
-tap-schema:
-  enabled: true
-telegraf:
-  enabled: true
-telegraf-ds:
-  enabled: true
-times-square:
-  enabled: false
-vault-secrets-operator:
-  enabled: true
-vo-cutouts:
-  enabled: true
+applications:
+  butler: true
+  datalinker: true
+  filestore-backup: true
+  hips: true
+  mobu: true
+  nublado: true
+  portal: true
+  semaphore: true
+  siav2: true
+  squareone: true
+  ssotap: true
+  tap: true
+  telegraf: true
+  telegraf-ds: true
+  times-square: true
+  vo-cutouts: true

@@ -9,20 +9,48 @@ strimzi-kafka:
         loadBalancerIP: "139.229.180.2"
         host: sasquatch-summit-kafka-bootstrap.lsst.codes
       brokers:
-        - loadBalancerIP: "139.229.180.3"
+        - broker: 0
+          loadBalancerIP: "139.229.180.3"
           host: sasquatch-summit-kafka-0.lsst.codes
-        - loadBalancerIP: "139.229.180.4"
+        - broker: 1
+          loadBalancerIP: "139.229.180.4"
           host: sasquatch-summit-kafka-1.lsst.codes
-        - loadBalancerIP: "139.229.180.5"
+        - broker: 2
+          loadBalancerIP: "139.229.180.5"
           host: sasquatch-summit-kafka-2.lsst.codes
-  zookeeper:
-    storage:
-      storageClassName: rook-ceph-block
+  kraft:
+    enabled: true
+  kafkaController:
+    enabled: true
+    resources:
+      requests:
+        memory: 8Gi
+        cpu: "2"
+      limits:
+        memory: 8Gi
+        cpu: "2"
   users:
     tsSalKafka:
       enabled: true
+    camera:
+      enabled: true
     replicator:
       enabled: true
+    kafdrop:
+      enabled: true
+    telegraf:
+      enabled: true
+    kafkaConnectManager:
+      enabled: true
+    consdb:
+      enabled: true
+  registry:
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      hostname: summit-lsp.lsst.codes
+      path: /schema-registry(/|$)(.*)
 
 influxdb:
   persistence:
@@ -31,15 +59,13 @@ influxdb:
   ingress:
     enabled: true
     hostname: summit-lsp.lsst.codes
-
-influxdb2:
-  enabled: true
-  persistence:
-    storageClass: rook-ceph-block
-    size: 5Ti
-  ingress:
-    enabled: true
-    hostname: summit-lsp.lsst.codes
+  resources:
+    requests:
+      memory: 128Gi
+      cpu: 16
+    limits:
+      memory: 128Gi
+      cpu: 16
 
 kafka-connect-manager:
   influxdbSink:
@@ -58,6 +84,7 @@ kafka-connect-manager:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTMount"
+        tasksMax: "8"
       comcam:
         enabled: true
         repairerConnector: false
@@ -65,7 +92,7 @@ kafka-connect-manager:
       eas:
         enabled: true
         repairerConnector: false
-        topicsRegex: ".*DIMM|.*DSM|.*ESS|.*HVAC|.*WeatherForecast"
+        topicsRegex: ".*DIMM|.*DSM|.*EPM|.*ESS|.*HVAC|.*WeatherForecast"
       latiss:
         enabled: true
         repairerConnector: false
@@ -74,6 +101,7 @@ kafka-connect-manager:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTM1M3"
+        tasksMax: "8"
       m2:
         enabled: true
         repairerConnector: false
@@ -88,7 +116,7 @@ kafka-connect-manager:
         topicsRegex: ".*OCPS"
       test:
         enabled: true
-        topicsRegex: ".*Test"
+        topicsRegex: "lsst.sal.Test"
       pmd:
         enabled: true
         repairerConnector: false
@@ -117,85 +145,52 @@ kafka-connect-manager:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*LaserTracker"
+      lsstcam:
+        enabled: true
+        repairerConnector: false
+        topicsRegex: ".*MTCamera|.*MTHeaderService|.*MTOODS"
 
 telegraf-kafka-consumer:
   enabled: true
   kafkaConsumers:
-    auxtel:
+    backpack:
       enabled: true
+      replicaCount: 1
+      database: "lsst.backpack"
+      timestamp_format: "unix"
+      timestamp_field: "timestamp"
       topicRegexps: |
-        [ ".*ATAOS", ".*ATDome", ".*ATDomeTrajectory", ".*ATHexapod", ".*ATPneumatics", ".*ATPtg", ".*ATMCS" ]
-    maintel:
+        [ "lsst.backpack" ]
+    atcamera:
       enabled: true
+      replicaCount: 1
+      database: "lsst.ATCamera"
+      timestamp_format: "unix_ms"
+      timestamp_field: "timestamp"
+      tags: |
+        [ "Agent", "Aspic", "Location", "Raft", "Reb", "Sensor", "Source" ]
       topicRegexps: |
-        [ ".*MTAOS", ".*MTDome", ".*MTDomeTrajectory", ".*MTPtg" ]
-    mtmount:
+        [ "lsst.ATCamera" ]
+    cccamera:
       enabled: true
+      replicaCount: 1
+      database: "lsst.CCCamera"
+      timestamp_format: "unix_ms"
+      timestamp_field: "timestamp"
+      tags: |
+        [ "Agent", "Aspic", "Cold", "Cryo", "Hardware", "Location", "Ps", "RTD", "Raft", "Reb", "Segment", "Sensor", "Source" ]
       topicRegexps: |
-        [ ".*MTMount" ]
-    comcam:
+        [ "lsst.CCCamera" ]
+    mtcamera:
       enabled: true
+      replicaCount: 1
+      database: "lsst.MTCamera"
+      timestamp_format: "unix_ms"
+      timestamp_field: "timestamp"
+      tags: |
+        [ "Agent", "Aspic", "Axis", "Canbus", "Cip", "Clamp", "Cold", "Controller", "Cryo", "Gateway", "Hardware", "Hip", "Hook", "Latch", "Location", "Ps", "RTD", "Raft", "Reb", "Segment", "Sensor", "Socket", "Source", "Truck" ]
       topicRegexps: |
-        [ ".*CCCamera", ".*CCHeaderService", ".*CCOODS" ]
-    eas:
-      enabled: true
-      topicRegexps: |
-        [ ".*DIMM", ".*DSM", ".*ESS", ".*HVAC", ".*WeatherForecast" ]
-    latiss:
-      enabled: true
-      topicRegexps: |
-        [ ".*ATCamera", ".*ATHeaderService", ".*ATOODS", ".*ATSpectrograph" ]
-    m1m3:
-      enabled: true
-      flush_interval: "1s"
-      metric_batch_size: 5000
-      interval: "0.1s"
-      topicRegexps: |
-        [ ".*MTM1M3" ]
-    m2:
-      enabled: true
-      topicRegexps: |
-        [ ".*MTHexapod", ".*MTM2", ".*MTRotator" ]
-    obssys:
-      enabled: true
-      topicRegexps: |
-        [ ".*Scheduler", ".*Script", ".*ScriptQueue", ".*Watcher" ]
-    ocps:
-      enabled: true
-      topicRegexps: |
-        [ ".*OCPS" ]
-    test:
-      enabled: true
-      topicRegexps: |
-        [ "lsst.sal.Test" ]
-    pmd:
-      enabled: true
-      topicRegexps: |
-        [ ".*PMD" ]
-    calsys:
-      enabled: true
-      topicRegexps: |
-        [ ".*ATMonochromator", ".*ATWhiteLight", ".*CBP", ".*Electrometer", ".*FiberSpectrograph", ".*LinearStage", ".*TunableLaser" ]
-    mtaircompressor:
-      enabled: true
-      topicRegexps: |
-        [ ".*MTAirCompressor" ]
-    genericcamera:
-      enabled: true
-      topicRegexps: |
-        [ ".*GCHeaderService", ".*GenericCamera" ]
-    gis:
-      enabled: true
-      topicRegexps: |
-        [ ".*GIS" ]
-    mtvms:
-      enabled: true
-      topicRegexps: |
-        [ ".*MTVMS" ]
-    lasertracker:
-      enabled: true
-      topicRegexps: |
-        [ ".*LaserTracker" ]
+        [ "lsst.MTCamera" ]
 
 kafdrop:
   ingress:
@@ -207,12 +202,15 @@ rest-proxy:
   ingress:
     enabled: true
     hostname: summit-lsp.lsst.codes
+  configurationOverrides:
+    "access.control.allow.origin": https://summit-lsp.lsst.codes/love,http://love01.cp.lsst.org
   kafka:
-    topics:
-      - test.next-visit
     topicPrefixes:
-      - test
       - lsst.dm
+      - lsst.backpack
+      - lsst.ATCamera
+      - lsst.CCCamera
+      - lsst.MTCamera
 
 chronograf:
   persistence:

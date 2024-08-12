@@ -1,0 +1,64 @@
+argo-cd:
+  global:
+    env:
+      - name: "HTTP_PROXY"
+        value: "http://squid.slac.stanford.edu:3128"
+      - name: "HTTPS_PROXY"
+        value: "http://squid.slac.stanford.edu:3128"
+      - name: "NO_PROXY"
+        value: "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.cluster.local,argocd-repo-server"
+
+  configs:
+    cm:
+      url: "https://usdf-rsp-int.slac.stanford.edu/argo-cd"
+      oidc.config: |
+        name: SLAC
+        issuer: https://dex.slac.stanford.edu
+        clientID: "vcluster--usdf-rsp-int"
+        clientSecret: $dex.clientSecret
+        # Optional set of OIDC scopes to request. If omitted, defaults to:
+        # ["openid", "profile", "email", "groups"]
+        requestedScopes: ["openid", "profile", "email", "groups"]
+        # Optional set of OIDC claims to request on the ID token.
+        requestedIDTokenClaims: {"groups": {"essential": true}}
+    rbac:
+      policy.csv: |
+        p, role:developer, applications, *, */*, allow
+        p, role:developer, applications, get, infrastructure/*, allow
+        p, role:developer, applications, create, infrastructure/*, deny
+        p, role:developer, applications, update, infrastructure/*, deny
+        p, role:developer, applications, delete, infrastructure/*, deny
+        p, role:developer, applications, sync, infrastructure/*, deny
+        p, role:developer, applications, override, infrastructure/*, deny
+        p, role:developer, applications, action/*, infrastructure/*, deny
+
+        g, afausti@slac.stanford.edu, role:admin
+        g, athor@slac.stanford.edu, role:admin
+        g, danfuchs@slac.stanford.edu, role:admin
+        g, dspeck@slac.stanford.edu, role:admin
+        g, frossie@slac.stanford.edu, role:admin
+        g, jsick@slac.stanford.edu, role:admin
+        g, pav@slac.stanford.edu, role:admin
+        g, ppascual@slac.stanford.edu, role:admin
+        g, reinking@slac.stanford.edu, role:admin
+        g, rra@slac.stanford.edu, role:admin
+        g, ytl@slac.stanford.edu, role:admin
+        g, ktl@slac.stanford.edu, role:admin
+        g, cslater@slac.stanford.edu, role:admin
+
+
+        g, fritzm@slac.stanford.edu, role:developer
+        g, hchiang2@slac.stanford.edu, role:developer
+        g, jeremym@slac.stanford.edu, role:developer
+        g, mfl@slac.stanford.edu, role:developer
+        g, mreuter@slac.stanford.edu, role:developer
+        g, neilsen@slac.stanford.edu, role:developer
+        g, omullan@slac.stanford.edu, role:developer
+        g, smart@slac.stanford.edu, role:developer
+        g, spothi@slac.stanford.edu, role:developer
+      scopes: "[email]"
+
+  server:
+    ingress:
+      hostname: "usdf-rsp-int.slac.stanford.edu"
+    tls: false

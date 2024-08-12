@@ -1,10 +1,38 @@
 config:
   debug: true
+  githubRefreshApp:
+    acceptedGithubOrgs:
+      - lsst-sqre
+  githubCiApp:
+    acceptedGithubOrgs:
+      - lsst-sqre
+    users:
+      - username: bot-mobu-ci-user-1
+      - username: bot-mobu-ci-user-2
+      - username: bot-mobu-ci-user-3
+      - username: bot-mobu-ci-user-4
+    scopes:
+      - "exec:notebook"
+      - "exec:portal"
+      - "read:image"
+      - "read:tap"
   autostart:
-    - name: "weekly"
+    - name: "dfuchs-test"
       count: 1
       users:
-        - username: "bot-mobu-weekly"
+        - username: "bot-mobu-dfuchs-test"
+      scopes:
+        - "exec:notebook"
+      business:
+        type: "NotebookRunner"
+        options:
+          repo_url: "https://github.com/lsst-sqre/dfuchs-test-mobu.git"
+          repo_ref: "main"
+        restart: true
+    - name: "recommended"
+      count: 1
+      users:
+        - username: "bot-mobu-recommended"
       scopes:
         - "exec:notebook"
         - "exec:portal"
@@ -13,11 +41,8 @@ config:
       business:
         type: "NotebookRunner"
         options:
-          image:
-            image_class: "latest-weekly"
           repo_url: "https://github.com/lsst-sqre/system-test.git"
-          repo_branch: "prod"
-          use_cachemachine: false
+          repo_ref: "prod"
         restart: true
     - name: "tutorial"
       count: 1
@@ -31,13 +56,10 @@ config:
       business:
         type: "NotebookRunner"
         options:
-          image:
-            image_class: "latest-weekly"
           repo_url: "https://github.com/rubin-dp0/tutorial-notebooks.git"
-          repo_branch: "main"
+          repo_ref: "prod"
           max_executions: 1
           working_directory: "notebooks/tutorial-notebooks"
-          use_cachemachine: false
         restart: true
     - name: "tap"
       count: 1
@@ -45,7 +67,7 @@ config:
         - username: "bot-mobu-tap"
       scopes: ["read:tap"]
       business:
-        type: "TAPQueryRunner"
+        type: "TAPQuerySetRunner"
         options:
           query_set: "dp0.2"
         restart: true

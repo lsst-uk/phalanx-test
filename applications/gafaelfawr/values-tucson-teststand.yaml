@@ -15,7 +15,7 @@ config:
 
   # Allow access by GitHub team.
   groupMapping:
-    "admin:provision":
+    "admin:jupyterlab":
       - github:
           organization: "lsst-sqre"
           team: "square"
@@ -35,7 +35,7 @@ config:
           team: "friends"
       - github:
           organization: "lsst-ts"
-          team: "base-access"
+          team: "tts-access"
       - github:
           organization: "rubin-summit"
           team: "rsp-access"
@@ -48,7 +48,7 @@ config:
           team: "friends"
       - github:
           organization: "lsst-ts"
-          team: "base-access"
+          team: "tts-access"
       - github:
           organization: "rubin-summit"
           team: "rsp-access"
@@ -61,7 +61,7 @@ config:
           team: "friends"
       - github:
           organization: "lsst-ts"
-          team: "base-access"
+          team: "tts-access"
       - github:
           organization: "rubin-summit"
           team: "rsp-access"
@@ -74,7 +74,7 @@ config:
           team: "friends"
       - github:
           organization: "lsst-ts"
-          team: "base-access"
+          team: "tts-access"
       - github:
           organization: "rubin-summit"
           team: "rsp-access"
@@ -87,7 +87,7 @@ config:
           team: "friends"
       - github:
           organization: "lsst-ts"
-          team: "base-access"
+          team: "tts-access"
       - github:
           organization: "rubin-summit"
           team: "rsp-access"
@@ -95,12 +95,18 @@ config:
       - github:
           organization: "lsst-sqre"
           team: "square"
+      - github:
+          organization: "lsst-ts"
+          team: "tts-access"
+      - github:
+          organization: "rubin-summit"
+          team: "rsp-access"
 
   initialAdmins:
     - "afausti"
     - "athornton"
-    - "cbanek"
+    - "fajpunk"
     - "frossie"
     - "jonathansick"
     - "rra"
-    - "simonkrughoff"
+    - "stvoutsin"

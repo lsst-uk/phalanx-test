@@ -1,0 +1,7 @@
+apiVersion: v2
+name: butler
+version: 1.0.0
+description: Server for Butler data abstraction service
+sources:
+  - https://github.com/lsst/daf_butler
+appVersion: server-2.0.0

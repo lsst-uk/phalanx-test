@@ -86,7 +86,8 @@ Applications that need a secret include a ``VaultSecret`` resource in their Helm
 Inside Kubernetes, the `Vault Secrets Operator`_ obtains the secret information from a Vault instance and formats it into a standard Kubernetes Secret_ that the application's containers can consume as environment variables or mounted files.
 
 Phalanx itself does not manage Vault.
-Most Rubin Science Platform environments use the Vault server at ``vault.lsst.codes``, which is hosted on `Roundtable`_.
+Most Rubin Science Platform environments use the Vault server at
+``vault.lsst.cloud``, which is hosted on `roundtable.lsst.cloud <https://roundtable.lsst.cloud>`_.
 Each installation environment has its own root path in that Vault server.
 Phalanx also includes scripts for syncing a 1Password_ vault into the Vault_ service.
 See :doc:`secrets` to learn more.
@@ -102,8 +103,12 @@ Phalanx includes applications that provide key functionality for other applicati
 ``cert-manager`` (TLS certificate management)
     Cert-manager acquires and renews TLS certificates from Let's Encrypt.
 
+``gafaelfawr``
+    Gafaelfawr is the authentication, access control, and identity management layer of Phalanx.
+    Phalanx applications rely on Gafaelfawr to authenticate the user and make most access control decisions, including rate limiting.
+
 ``ingress-nginx`` (ingress)
-    The ingress-nginx application routes traffic from the internet to individual applications, while also terminating TLS and integrating with Gafaelfawr, the auth handler.
+    The ingress-nginx application routes traffic from the internet to individual applications, while also terminating TLS and integrating with Gafaelfawr, the authentication and access control layer.
 
 ``vault-secrets-operator`` (secret configuration)
     Vault Secrets Operator bridges secrets in Vault_ with Kubernetes Secret_ resources.

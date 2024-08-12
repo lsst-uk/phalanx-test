@@ -8,6 +8,11 @@ In this section of the Phalanx documentation you can learn how to build and inte
 For background on Phalanx and how to contribute to the Phalanx repository itself, see the :doc:`/about/index` section.
 Individual applications are documented in the :doc:`/applications/index` section.
 
+.. note::
+
+   If you are maintaining Phalanx applications, contact SQuaRE to be added as a contributor to the https://github.com/lsst-sqre/phalanx repository.
+   Several of the steps below requiring pushing your development branches to that repository rather than using a fork.
+
 .. toctree::
    :maxdepth: 2
    :titlesonly:
@@ -22,11 +27,9 @@ Individual applications are documented in the :doc:`/applications/index` section
    :caption: Integration
    :name: dev-int-toc
 
-   chart-overview
-   add-application
+   helm-chart/index
    add-external-chart
-   add-a-onepassword-secret
-   update-a-onepassword-secret
+   shared-charts
 
 .. toctree::
    :maxdepth: 2
@@ -36,5 +39,16 @@ Individual applications are documented in the :doc:`/applications/index` section
 
    get-application-logs
    upgrade
+   update-a-secret
    deploy-from-a-branch
-   local-development
+   switch-environment-to-branch
+   resource-limits
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: Reference
+   :name: dev-reference-toc
+
+   secrets-spec
+   injected-values

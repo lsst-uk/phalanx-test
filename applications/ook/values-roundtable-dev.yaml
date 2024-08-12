@@ -3,3 +3,13 @@ image:
 
 config:
   logLevel: "DEBUG"
+  algolia:
+    documentIndex: "ook_documents_test"
+
+audit:
+  enabled: false
+  schedule: "30 1 * * *"
+  reingest: false
+
+ingestUpdated:
+  enabled: false

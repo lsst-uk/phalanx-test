@@ -36,8 +36,6 @@ spec:
           image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.controller.image.pullPolicy | quote }}
           env:
-            - name: DOCKER_SECRET_NAME
-              value: "pull-secret"
             - name: EXTERNAL_INSTANCE_URL
               value: {{ .Values.global.baseUrl | quote }}
             {{- if .Values.controller.slackAlerts }}
@@ -55,9 +53,9 @@ spec:
             httpGet:
               path: "/"
               port: "http"
-          {{- with .Values.resources }}
+          {{- with .Values.controller.resources }}
           resources:
-            {{- toYaml .Values.controller.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
             - name: "config"
@@ -70,8 +68,6 @@ spec:
             {{- end }}
             - name: "podinfo"
               mountPath: "/etc/podinfo"
-            - name: "tmp"
-              mountPath: "/tmp"
       {{- with .Values.controller.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -97,17 +93,12 @@ spec:
         - name: "podinfo"
           downwardAPI:
             items:
-              - path: "annotations"
-                fieldRef:
-                  fieldPath: "metadata.annotations"
-              - path: "labels"
-                fieldRef:
-                  fieldPath: "metadata.labels"
               - path: "name"
                 fieldRef:
                   fieldPath: "metadata.name"
+              - path: "namespace"
+                fieldRef:
+                  fieldPath: "metadata.namespace"
               - path: "uid"
                 fieldRef:
                   fieldPath: "metadata.uid"
-        - name: "tmp"
-          emptyDir: {}

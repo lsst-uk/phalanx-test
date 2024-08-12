@@ -1,88 +1,64 @@
 argo-cd:
-  redis:
-    enabled: true
-
-  server:
-    ingress:
-      enabled: true
-      hosts:
-        - "usdf-rsp-dev.slac.stanford.edu"
-      annotations:
-        kubernetes.io/ingress.class: nginx
-        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-      paths:
-        - /argo-cd(/|$)(.*)
-
-    extraArgs:
-      - "--basehref=/argo-cd"
-      - "--insecure=true"
-
+  global:
     env:
-      - name: HTTP_PROXY
-        value: http://squid.slac.stanford.edu:3128
-      - name: HTTPS_PROXY
-        value: http://squid.slac.stanford.edu:3128
-      - name: NO_PROXY
-        value: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.cluster.local,argocd-repo-server
+      - name: "HTTP_PROXY"
+        value: "http://squid.slac.stanford.edu:3128"
+      - name: "HTTPS_PROXY"
+        value: "http://squid.slac.stanford.edu:3128"
+      - name: "NO_PROXY"
+        value: "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.cluster.local,argocd-repo-server"
 
-    config:
-      url: https://usdf-rsp-dev.slac.stanford.edu/argo-cd
+  configs:
+    cm:
+      url: "https://usdf-rsp-dev.slac.stanford.edu/argo-cd"
       oidc.config: |
         name: SLAC
         issuer: https://dex.slac.stanford.edu
-        clientID: $oidc.clientId
-        clientSecret: $oidc.clientSecret
-        # Optional set of OIDC scopes to request. If omitted, defaults to: ["openid", "profile", "email", "groups"]
+        clientID: usdf-rsp-dev-argocd
+        clientSecret: $dex.clientSecret
+        # Optional set of OIDC scopes to request. If omitted, defaults to:
+        # ["openid", "profile", "email", "groups"]
         requestedScopes: ["openid", "profile", "email", "groups"]
         # Optional set of OIDC claims to request on the ID token.
         requestedIDTokenClaims: {"groups": {"essential": true}}
-    rbacConfig:
+    rbac:
       policy.csv: |
-        g, ytl@slac.stanford.edu, role:admin
-        g, ppascual@slac.stanford.edu, role:admin
-        g, pav@slac.stanford.edu, role:admin
-        g, dspeck@slac.stanford.edu, role:admin
+        p, role:developer, applications, *, */*, allow
+        p, role:developer, applications, get, infrastructure/*, allow
+        p, role:developer, applications, create, infrastructure/*, deny
+        p, role:developer, applications, update, infrastructure/*, deny
+        p, role:developer, applications, delete, infrastructure/*, deny
+        p, role:developer, applications, sync, infrastructure/*, deny
+        p, role:developer, applications, override, infrastructure/*, deny
+        p, role:developer, applications, action/*, infrastructure/*, deny
+
         g, afausti@slac.stanford.edu, role:admin
-        g, mfl@slac.stanford.edu, role:admin
-        g, cbanek@slac.stanford.edu, role:admin
-        g, frossie@slac.stanford.edu, role:admin
-        g, hchiang2@slac.stanford.edu, role:admin
         g, athor@slac.stanford.edu, role:admin
+        g, danfuchs@slac.stanford.edu, role:admin
+        g, dspeck@slac.stanford.edu, role:admin
+        g, frossie@slac.stanford.edu, role:admin
         g, jsick@slac.stanford.edu, role:admin
+        g, ktl@slac.stanford.edu, role:admin
+        g, pav@slac.stanford.edu, role:admin
+        g, ppascual@slac.stanford.edu, role:admin
         g, reinking@slac.stanford.edu, role:admin
-        g, smart@slac.stanford.edu, role:admin
-        g, omullan@slac.stanford.edu, role:admin
-        g, mreuter@slac.stanford.edu, role:admin
         g, rra@slac.stanford.edu, role:admin
-        g, fritzm@slac.stanford.edu, role:admin
+        g, ytl@slac.stanford.edu, role:admin
         g, cslater@slac.stanford.edu, role:admin
+
+        g, dirving@slac.stanford.edu, role:developer
+        g, fritzm@slac.stanford.edu, role:developer
+        g, hchiang2@slac.stanford.edu, role:developer
+        g, jeremym@slac.stanford.edu, role:developer
+        g, mfl@slac.stanford.edu, role:developer
+        g, mreuter@slac.stanford.edu, role:developer
+        g, neilsen@slac.stanford.edu, role:developer
+        g, omullan@slac.stanford.edu, role:developer
+        g, saranda@slac.stanford.edu, role:developer
+        g, smart@slac.stanford.edu, role:developer
+        g, spothi@slac.stanford.edu, role:developer
       scopes: "[email]"
 
-      helm.repositories: |
-        - url: https://lsst-sqre.github.io/charts/
-          name: lsst-sqre
-        - url: https://charts.helm.sh/stable
-          name: stable
-  repoServer:
-
-    env:
-      - name: HTTP_PROXY
-        value: http://sdfproxy.sdf.slac.stanford.edu:3128
-      - name: HTTPS_PROXY
-        value: http://sdfproxy.sdf.slac.stanford.edu:3128
-      - name: NO_PROXY
-        value: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.cluster.local,argocd-repo-server
-
-  controller:
-
-    env:
-      - name: HTTP_PROXY
-        value: http://sdfproxy.sdf.slac.stanford.edu:3128
-      - name: HTTPS_PROXY
-        value: http://sdfproxy.sdf.slac.stanford.edu:3128
-      - name: NO_PROXY
-        value: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.cluster.local,argocd-repo-server
-
-  configs:
-    secret:
-      createSecret: false
+  server:
+    ingress:
+      hostname: "usdf-rsp-dev.slac.stanford.edu"

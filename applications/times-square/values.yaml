@@ -33,11 +33,11 @@ podAnnotations: {}
 
 serviceAccount:
   # -- Force creation of a service account. Normally, no service account is
-  # used or mounted. If CloudSQL is enabled, a service account is always
+  # used or mounted. If Cloud SQL is enabled, a service account is always
   # created regardless of this value.
   create: false
 
-  # -- Annotations to add to the service account. If CloudSQL is in use, the
+  # -- Annotations to add to the service account. If Cloud SQL is in use, the
   # annotation specifying the Google service account will also be added.
   annotations: {}
 
@@ -59,8 +59,28 @@ ingress:
   # -- Root URL path prefix for times-square API
   path: "/times-square/api"
 
+  # -- scope for general operations
+  defaultScope: "exec:notebook"
+  # -- scope for using just the template engine
+  templateApiScope: "exec:notebook"
+
 # -- Resource limits and requests for the times-square deployment pod
-resources: {}
+# @default -- see `values.yaml`
+resources:
+  timesSquare:
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+    requests:
+      cpu: "2m"
+      memory: "100Mi"
+  timesSquareWorker:
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+    requests:
+      cpu: "2m"
+      memory: "256Mi"
 
 autoscaling:
   # -- Enable autoscaling of times-square deployment
@@ -116,8 +136,12 @@ config:
   # -- GitHub organizations that can sync repos to Times Square (comma-separated).
   githubOrgs: "lsst,lsst-sqre,lsst-dm,lsst-ts,lsst-sitcom,lsst-pst"
 
+  worker:
+    # -- Enable liveness checks for the arq queue
+    enableLivenessCheck: true
+
 cloudsql:
-  # -- Enable the Cloud SQL Auth Proxy sidecar, used with CloudSQL databases
+  # -- Enable the Cloud SQL Auth Proxy sidecar, used with Cloud SQL databases
   # on Google Cloud
   enabled: false
 
@@ -126,12 +150,22 @@ cloudsql:
     repository: "gcr.io/cloudsql-docker/gce-proxy"
 
     # -- Cloud SQL Auth Proxy tag to use
-    tag: "1.33.9"
+    tag: "1.36.0"
 
     # -- Pull policy for Cloud SQL Auth Proxy images
     pullPolicy: "IfNotPresent"
 
-  # -- Instance connection name for a CloudSQL PostgreSQL instance
+    # -- Resource requests and limits for Cloud SQL pod
+    # @default -- see `values.yaml`
+    resources:
+      limits:
+        cpu: "1"
+        memory: "4Gi"
+      requests:
+        cpu: "1m"
+        memory: "512Mi"
+
+  # -- Instance connection name for a Cloud SQL PostgreSQL instance
   instanceConnectionName: ""
 
   # -- The Google service account that has an IAM binding to the `times-square`
@@ -160,6 +194,10 @@ redis:
   resources:
     limits:
       cpu: "1"
+      memory: "2Gi"
+    requests:
+      cpu: "6m"
+      memory: "50Mi"
 
   # -- Pod annotations for the Redis pod
   podAnnotations: {}

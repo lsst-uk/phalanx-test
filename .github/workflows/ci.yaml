@@ -9,23 +9,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.22'
 
       - name: Install helm-docs
-        run: go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+        run: go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.13.1
         env:
           GOBIN: /usr/local/bin/
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
 
   test:
     runs-on: ubuntu-latest
@@ -35,14 +37,16 @@ jobs:
       matrix:
         python:
           - "3.11"
+          - "3.12"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: lsst-sqre/run-tox@v1
         with:
           python-version: ${{ matrix.python }}
           tox-envs: "typing,py,coverage-report"
+          tox-requirements: requirements/tox.txt
           cache-key-prefix: test
 
   helm:
@@ -50,32 +54,33 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: azure/setup-helm@v4
         with:
-          python-version: "3.11"
+          # Used to query GitHub for the latest Helm release.
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install test dependencies
-        run: make init
+      - name: Install helm-unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest
 
-      - name: Expand modified charts
-        run: expand-charts
+      - name: Run helm unittest
+        run: helm unittest {applications,charts}/*/tests/..
 
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.4.0
-
-      - name: Run chart-testing (lint)
-        run: ct lint --all --config ct.yaml
+      - uses: lsst-sqre/run-tox@v1
+        with:
+          python-version: "3.12"
+          tox-envs: phalanx-lint-change
+          tox-requirements: requirements/tox.txt
+          cache-key-prefix: helm
 
   # The minikube job always runs, but it quickly does nothing if no files that
-  # would affect minikube were changed.  This unfortunately requires a lot of
+  # would affect minikube were changed. This unfortunately requires a lot of
   # if conditionals on all the steps of the job, but we need the job to run so
   # that we can make it mandatory before merging, which in turn allows us to
-  # use automerge.
+  # use merge queues.
   minikube:
     name: Test deploy
     runs-on: ubuntu-latest
@@ -84,27 +89,38 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Filter paths
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
             minikube:
               - ".github/workflows/ci.yaml"
-              - "applications/*/Chart.yaml"
-              - "applications/*/templates/**"
-              - "applications/*/values.yaml"
-              - "applications/*/values-minikube.yaml"
+              - "applications/{argocd,gafaelfawr,ingress-nginx,mobu,postgres,vault-secrets-operator}/Chart.yaml"
+              - "applications/{argocd,gafaelfawr,ingress-nginx,mobu,postgres,vault-secrets-operator}/templates/**"
+              - "applications/{argocd,gafaelfawr,ingress-nginx,mobu,postgres,vault-secrets-operator}/values.yaml"
+              - "applications/{argocd,gafaelfawr,ingress-nginx,mobu,postgres,vault-secrets-operator}/values-minikube.yaml"
               - "environments/Chart.yaml"
-              - "environments/templates/**"
+              - "environments/templates/applications/infrastructure/*"
               - "environments/values-minikube.yaml"
-              - "installer/**"
+              - "src/phalanx/**"
+
+      - name: Download installer dependencies
+        if: steps.filter.outputs.minikube == 'true'
+        run: |
+          curl -sSL -o /tmp/vault.zip https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
+          unzip /tmp/vault.zip
+          sudo mv vault /usr/local/bin/vault
+          sudo chmod +x /usr/local/bin/vault
+          sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.8.6/argocd-linux-amd64
+          sudo chmod +x /usr/local/bin/argocd
+          sudo apt-get install socat
 
       - name: Setup Minikube
         if: steps.filter.outputs.minikube == 'true'
-        uses: medyagh/setup-minikube@v0.0.14
+        uses: medyagh/setup-minikube@v0.0.18
         with:
           kubernetes-version: "v1.27.3"
           cpus: max
@@ -114,24 +130,19 @@ jobs:
         if: steps.filter.outputs.minikube == 'true'
         run: kubectl get nodes
 
-      - name: Download installer dependencies
+      - uses: lsst-sqre/run-tox@v1
         if: steps.filter.outputs.minikube == 'true'
-        run: |
-          curl -sSL -o /tmp/vault.zip https://releases.hashicorp.com/vault/1.14.0/vault_1.14.0_linux_amd64.zip
-          unzip /tmp/vault.zip
-          sudo mv vault /usr/local/bin/vault
-          sudo chmod +x /usr/local/bin/vault
-          sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.7.8/argocd-linux-amd64
-          sudo chmod +x /usr/local/bin/argocd
-          sudo apt-get install socat
-          sudo pip install -r installer/requirements.txt
-
-      - name: Run installer
         timeout-minutes: 15
-        if: steps.filter.outputs.minikube == 'true'
-        run: |
-          cd installer
-          ./install.sh minikube ${{ secrets.MINIKUBE_VAULT_KEY }}
+        with:
+          python-version: "3.12"
+          tox-envs: install
+          tox-requirements: requirements/tox.txt
+          tox-posargs: >-
+            --force-noninteractive
+            --vault-role-id=${{ secrets.MINIKUBE_VAULT_ROLE_ID }}
+            --vault-secret-id=${{ secrets.MINIKUBE_VAULT_SECRET_ID }}
+            minikube
+          cache-key-prefix: test
 
       - name: Get final list of resources
         if: steps.filter.outputs.minikube == 'true'

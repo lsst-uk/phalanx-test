@@ -11,7 +11,6 @@ config:
   cilogon:
     clientId: "cilogon:/client_id/22adcdc145791f85b4d1edbf3157e21b"
     enrollmentUrl: "https://id.lsst.cloud/registry/co_petitions/start/coef:6"
-    usernameClaim: "username"
 
   ldap:
     url: "ldaps://ldap.cilogon.org"
@@ -19,12 +18,18 @@ config:
     groupBaseDn: "ou=groups,o=LSST,o=CO,dc=lsst,dc=org"
     groupObjectClass: "eduMember"
     groupMemberAttr: "hasMember"
+    groupSearchByDn: false
     userBaseDn: "ou=people,o=LSST,o=CO,dc=lsst,dc=org"
     userSearchAttr: "voPersonApplicationUID"
+    uidAttr: null
+    gidAttr: null
     addUserGroup: true
 
   firestore:
     project: "rsp-firestore-stable-e8eb"
+
+  # Support generating user metadata for CADC authentication code.
+  cadcBaseUuid: "5f0eb655-0e72-4948-a6a5-a94c0be9019f"
 
   # User quota settings for services.
   quota:
@@ -34,7 +39,7 @@ config:
         memory: 16
 
   groupMapping:
-    "admin:provision":
+    "admin:jupyterlab":
       - "g_admins"
     "exec:admin":
       - "g_admins"
@@ -46,15 +51,17 @@ config:
       - "g_users"
     "read:tap":
       - "g_users"
+    "write:files":
+      - "g_users"
 
   initialAdmins:
     - "afausti"
     - "athornton"
-    - "cbanek"
+    - "danfuchs"
     - "frossie"
     - "jonathansick"
     - "rra"
-    - "simonkrughoff"
+    - "svoutsin"
 
   errorFooter: |
     To report problems or ask for help, please open an issue in the

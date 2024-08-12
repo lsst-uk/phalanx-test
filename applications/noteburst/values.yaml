@@ -13,6 +13,10 @@ global:
   # @default -- Set by Argo CD
   host: ""
 
+  # -- Base path for Vault secrets
+  # @default -- Set by Argo CD
+  vaultSecretsPath: ""
+
 # -- Number of API pods to run
 replicaCount: 1
 
@@ -64,18 +68,25 @@ ingress:
   # -- Path prefix where noteburst is hosted
   path: "/noteburst"
 
+# -- Resource requests and limits for noteburst
+# @default -- See `values.yaml`
 resources:
-  {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  # -- Resource limits and requests for the noteburst FastAPI pods
+  noteburst:
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+    requests:
+      cpu: "2m"
+      memory: "128Mi"
+  # -- Resource limits and requests for the noteburst arq worker FastAPI pods
+  noteburstWorker:
+    limits:
+      cpu: "1"
+      memory: "4000Mi"
+    requests:
+      cpu: "2m"
+      memory: "256Mi"
 
 autoscaling:
   enabled: false
@@ -111,6 +122,9 @@ config:
     # -- The default notebook execution timeout, in seconds.
     jobTimeout: 300
 
+    # -- Max number of concurrent notebook executions per worker
+    maxConcurrentJobs: 3
+
     # -- Worker token lifetime, in seconds.
     tokenLifetime: "2419200"
 
@@ -118,7 +132,7 @@ config:
     tokenScopes: "exec:notebook,read:image,read:tap,read:alertdb"
 
     # -- Nublado image stream to select: "recommended", "weekly" or "reference"
-    imageSelector: "weekly"
+    imageSelector: "recommended"
 
     # -- Nublado image reference, applicable when imageSelector is "reference"
     imageReference: ""
@@ -129,7 +143,7 @@ config:
 redis:
   persistence:
     # -- Whether to persist Redis storage and thus tokens. Setting this to
-    # false will use `emptyDir` and reset all tokens on every restart. Only
+    # false will use `emptyDir` and reset data on every restart. Only
     # use this for a test deployment.
     enabled: true
 
@@ -148,6 +162,10 @@ redis:
   resources:
     limits:
       cpu: "1"
+      memory: "4Gi"
+    requests:
+      cpu: "2m"
+      memory: "512Mi"
 
   # -- Pod annotations for the Redis pod
   podAnnotations: {}

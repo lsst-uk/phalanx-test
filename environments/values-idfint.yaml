@@ -1,83 +1,37 @@
-environment: idfint
-fqdn: data-int.lsst.cloud
-vaultPathPrefix: secret/k8s_operator/data-int.lsst.cloud
-butlerRepositoryIndex: "s3://butler-us-central1-repo-locations/data-int-repos.yaml"
+name: "idfint"
+fqdn: "data-int.lsst.cloud"
+appOfAppsName: "science-platform"
+butlerServerRepositories:
+  dp02: "https://data-int.lsst.cloud/api/butler/repo/dp02/butler.yaml"
+gcp:
+  projectId: "science-platform-int-dc5d"
+  region: "us-central1"
+  clusterName: "science-platform-int"
+onepassword:
+  connectUrl: "https://roundtable.lsst.cloud/1password"
+  vaultTitle: "RSP data-int.lsst.cloud"
+vaultPathPrefix: "secret/phalanx/idfint"
 
-alert-stream-broker:
-  enabled: true
-argo-workflows:
-  enabled: false
-cachemachine:
-  enabled: true
-cert-manager:
-  enabled: true
-datalinker:
-  enabled: true
-exposurelog:
-  enabled: false
-gafaelfawr:
-  enabled: true
-hips:
-  enabled: true
-ingress-nginx:
-  enabled: true
-kubernetes-replicator:
-  enabled: false
-linters:
-  enabled: true
-mobu:
-  enabled: true
-moneypenny:
-  enabled: true
-monitoring:
-  enabled: false
-narrativelog:
-  enabled: false
-noteburst:
-  enabled: false
-nublado:
-  enabled: true
-nublado2:
-  enabled: true
-ook:
-  enabled: false
-plot-navigator:
-  enabled: true
-portal:
-  enabled: true
-postgres:
-  enabled: true
-sasquatch:
-  enabled: true
-ssotap:
-  enabled: true
-production-tools:
-  enabled: true
-semaphore:
-  enabled: true
-sherlock:
-  enabled: true
-squarebot:
-  enabled: false
-squareone:
-  enabled: true
-strimzi:
-  enabled: true
-strimzi-access-operator:
-  enabled: false
-strimzi-registry-operator:
-  enabled: false
-tap:
-  enabled: true
-tap-schema:
-  enabled: true
-telegraf:
-  enabled: true
-telegraf-ds:
-  enabled: true
-times-square:
-  enabled: false
-vault-secrets-operator:
-  enabled: true
-vo-cutouts:
-  enabled: true
+applications:
+  butler: true
+  datalinker: true
+  filestore-backup: true
+  hips: true
+  mobu: true
+  nublado: true
+  plot-navigator: true
+  portal: true
+  sasquatch: true
+  siav2: true
+  ssotap: true
+  production-tools: true
+  sasquatch-backpack: true
+  semaphore: true
+  sqlproxy-cross-project: true
+  squareone: true
+  strimzi: true
+  tap: true
+  telegraf: true
+  telegraf-ds: true
+  times-square: true
+  vo-cutouts: true

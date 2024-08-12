@@ -4,50 +4,55 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sasquatch-telegraf-kafka-consumer-{{ $key }}
+  name: sasquatch-telegraf-{{ $key }}
   labels:
-    app: sasquatch-telegraf-kafka-consumer
+    app: sasquatch-telegraf-kakfa-consumer
 data:
   telegraf.conf: |+
     [agent]
-      collection_jitter = "0s"
-      debug = true
-      flush_interval = {{ default "1s" $value.flush_interval | quote }}
-      flush_jitter = "0s"
       interval = {{ default "1s" $value.interval | quote }}
-      logfile = ""
-      metric_batch_size = {{ default 1000 $value.metric_batch_size }}
-      metric_buffer_limit = 10000
-      omit_hostname = true
-      precision = ""
-      quiet = false
       round_interval = true
+      metric_batch_size = {{ default 1000 $value.metric_batch_size }}
+      metric_buffer_limit = {{ default 10000 $value.metric_buffer_limit }}
+      collection_jitter = {{ default "0s" $value.collection_jitter | quote }}
+      flush_interval = {{ default "1s" $value.flush_interval | quote }}
+      flush_jitter = {{ default "0s" $value.flush_jitter | quote }}
+      debug = {{ default false $value.debug }}
+      omit_hostname = true
 
-    [[outputs.influxdb_v2]]
-      bucket = {{ $.Values.influxdb2.bucket | quote }}
-      token = "$INFLUXDB_TOKEN"
-      organization = "default"
+    [[outputs.influxdb]]
       urls = [
-        "http://sasquatch-influxdb2.sasquatch:80"
+        {{ $.Values.influxdb.url | quote }}
       ]
+      database = {{ $value.database | quote }}
+      username = "${INFLUXDB_USER}"
+      password = "${INFLUXDB_PASSWORD}"
 
     [[inputs.kafka_consumer]]
-      avro_schema_registry = "http://sasquatch-schema-registry.sasquatch:8081"
-      avro_timestamp = "private_efdStamp"
-      avro_timestamp_format = "unix"
       brokers = [
         "sasquatch-kafka-brokers.sasquatch:9092"
       ]
       consumer_group = "telegraf-kafka-consumer-{{ $key }}"
-      data_format = "avro"
-      max_processing_time = "5s"
       sasl_mechanism = "SCRAM-SHA-512"
       sasl_password = "$TELEGRAF_PASSWORD"
       sasl_username = "telegraf"
-      topic_refresh_interval = {{ default "60s" $value.topicRefreshInterval |  quote }}
+      data_format = "avro"
+      avro_schema_registry = "http://sasquatch-schema-registry.sasquatch:8081"
+      avro_timestamp = {{ default "private_efdStamp" $value.timestamp_field | quote }}
+      avro_timestamp_format = {{ default "unix" $value.timestamp_format | quote }}
+      avro_union_mode = {{ default "nullable" $value.union_mode | quote }}
+      avro_field_separator = {{ default "" $value.union_field_separator | quote }}
+      {{ with $value.fields }}
+      avro_fields = {{ $value.fields }}
+      {{ end }}
+      {{ with $value.tags }}
+      avro_tags = {{ $value.tags }}
+      {{ end }}
       topic_regexps = {{ $value.topicRegexps }}
-      offset = "newest"
-      consumer_fetch_default = "20MB"
+      offset = {{ default "oldest" $value.offset | quote }}
+      precision = {{ default "1us" $value.precision | quote }}
+      max_processing_time = {{ default "5s" $value.max_processing_time | quote }}
+      consumer_fetch_default = {{ default "20MB" $value.consumer_fetch_default | quote }}
 
     [[inputs.internal]]
       collect_memstats = false

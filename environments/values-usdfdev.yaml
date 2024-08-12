@@ -1,90 +1,38 @@
-environment: usdfdev
-fqdn: usdf-rsp-dev.slac.stanford.edu
-vaultPathPrefix: secret/rubin/usdf-rsp-dev
-# butlerRepositoryIndex: "s3://butler-us-central1-repo-locations/data-repos.yaml"
-repoURL: https://github.com/lsst-sqre/phalanx.git
+fqdn: "usdf-rsp-dev.slac.stanford.edu"
+name: "usdfdev"
+appOfAppsName: "science-platform"
+butlerServerRepositories:
+  embargo: "https://usdf-rsp-dev.slac.stanford.edu/api/butler/repo/embargo/butler.yaml"
+vaultUrl: "https://vault.slac.stanford.edu"
+vaultPathPrefix: "secret/rubin/usdf-rsp-dev"
 
-alert-stream-broker:
-  enabled: true
-argo-workflows:
-  enabled: false
-cachemachine:
-  enabled: true
-cert-manager:
-  enabled: false
-datalinker:
-  enabled: true
-exposurelog:
-  enabled: false
-gafaelfawr:
-  enabled: true
-hips:
-  enabled: false
-ingress-nginx:
-  enabled: false
-kubernetes-replicator:
-  enabled: false
-livetap:
-  enabled: true
-mobu:
-  enabled: true
-moneypenny:
-  enabled: true
-monitoring:
-  enabled: false
-narrativelog:
-  enabled: false
-noteburst:
-  enabled: true
-nublado:
-  enabled: true
-nublado2:
-  enabled: true
-obsloctap:
-  enabled: true
-obstap:
-  enabled: true
-ook:
-  enabled: false
-plot-navigator:
-  enabled: true
-portal:
-  enabled: true
-postgres:
-  enabled: true
-sasquatch:
-  enabled: true
-production-tools:
-  enabled: false
-semaphore:
-  enabled: true
-sherlock:
-  enabled: false
-ssotap:
-  enabled: true
-squarebot:
-  enabled: false
-squareone:
-  enabled: true
-squash-api:
-  enabled: false
-strimzi:
-  enabled: true
-strimzi-access-operator:
-  enabled: false
-strimzi-registry-operator:
-  enabled: false
-tap:
-  enabled: true
-tap-schema:
-  enabled: true
-telegraf:
-  enabled: false
-telegraf-ds:
-  enabled: false
-times-square:
-  enabled: true
-vault-secrets-operator:
-  enabled: true
-vo-cutouts:
-  enabled: false
+applications:
+  # This environment uses an ingress managed in a separate Kubernetes cluster,
+  # despite that configuration not being officially supported by Phalanx.
+  cert-manager: false
+  ingress-nginx: false
+
+  butler: true
+  consdb: true
+  datalinker: true
+  exposurelog: true
+  jira-data-proxy: true
+  livetap: true
+  mobu: true
+  narrativelog: true
+  noteburst: true
+  nublado: true
+  obsloctap: true
+  plot-navigator: true
+  portal: true
+  postgres: true
+  rubintv: true
+  sasquatch: true
+  schedview-snapshot: true
+  semaphore: true
+  siav2: true
+  ssotap: true
+  squareone: true
+  strimzi: true
+  tap: true
+  times-square: true

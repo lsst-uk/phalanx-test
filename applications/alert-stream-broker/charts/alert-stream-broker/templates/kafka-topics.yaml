@@ -1,0 +1,74 @@
+  {{- range $topic := .Values.topics }}
+  ---
+  apiVersion: "kafka.strimzi.io/{{ .Values.strimziAPIVersion }}"
+  kind: KafkaTopic
+  metadata:
+    name: "{{ $topic }}"
+    labels:
+      strimzi.io/cluster: "{{ .Values.clusterName }}"
+  spec:
+    partitions: {{ .Values.topicPartitions }}
+    replicas: {{ .Values.topicReplicas }}
+    config:
+      cleanup.policy: "delete"
+      retention.ms: {{ .Values.maxMillisecondsRetained }} # 7 days
+      retention.bytes: {{ .Values.maxBytesRetained }}
+  {{- end }}
+
+apiVersion: "kafka.strimzi.io/{{ .Values.strimziAPIVersion }}"
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: "{{ .Values.clusterName }}"
+  name: "{{ .Values.testTopicName}}"
+spec:
+  config:
+    cleanup.policy: "delete"
+    retention.ms: {{ .Values.maxMillisecondsRetained }} # 7 days
+    retention.bytes: {{ .Values.maxBytesRetained }}
+    # The default timestamp is the creation time of the alert.
+    # To get the ingestion rate, we need this to be the log
+    # append time, and the header will contain the producer
+    # timestamp instead
+    message.timestamp.type: 'LogAppendTime'
+  partitions: {{ .Values.topicPartitions }}
+  replicas: {{ .Values.topicReplicas }}
+---
+apiVersion: "kafka.strimzi.io/{{ .Values.strimziAPIVersion }}"
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: "{{ .Values.clusterName }}"
+  name: "{{ .Values.simulatedTopicName}}"
+spec:
+  config:
+    cleanup.policy: "delete"
+    retention.ms: {{ .Values.maxMillisecondsRetained }} # 7 days
+    retention.bytes: {{ .Values.maxBytesRetained }}
+    # The default timestamp is the creation time of the alert.
+    # To get the ingestion rate, we need this to be the log
+    # append time, and the header will contain the producer
+    # timestamp instead
+    message.timestamp.type: 'LogAppendTime'
+  partitions: {{ .Values.simulatedTopicPartitions }}
+  replicas: {{ .Values.simulatedTopicReplicas }}
+---
+apiVersion: "kafka.strimzi.io/{{ .Values.strimziAPIVersion }}"
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: "{{ .Values.clusterName }}"
+  name: "{{ .Values.devTopicName}}"
+spec:
+  config:
+    cleanup.policy: "delete"
+    retention.ms: {{ .Values.maxMillisecondsRetained }} # 7 days
+    retention.bytes: {{ .Values.maxBytesRetained }}
+    compression.type: {{ .Values.devTopicCompression}}
+    # The default timestamp is the creation time of the alert.
+    # To get the ingestion rate, we need this to be the log
+    # append time, and the header will contain the producer
+    # timestamp instead
+    message.timestamp.type: 'LogAppendTime'
+  partitions: {{ .Values.devTopicPartitions }}
+  replicas: {{ .Values.devTopicReplicas }}

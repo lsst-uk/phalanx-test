@@ -1,4 +1,7 @@
 strimzi-kafka:
+  cluster:
+    monitorLabel:
+      lsst.io/monitor: "true"
   kafka:
     storage:
       storageClassName: rook-ceph-block
@@ -9,15 +12,61 @@ strimzi-kafka:
         loadBalancerIP: "140.252.146.59"
         host: sasquatch-tts-kafka-bootstrap.lsst.codes
       brokers:
-        - loadBalancerIP: "140.252.146.46"
+        - broker: 0
+          loadBalancerIP: "140.252.146.46"
           host: sasquatch-tts-kafka-0.lsst.codes
-        - loadBalancerIP: "140.252.146.58"
+        - broker: 1
+          loadBalancerIP: "140.252.146.58"
           host: sasquatch-tts-kafka-1.lsst.codes
-        - loadBalancerIP: "140.252.146.47"
+        - broker: 2
+          loadBalancerIP: "140.252.146.47"
           host: sasquatch-tts-kafka-2.lsst.codes
-  zookeeper:
-    storage:
-      storageClassName: rook-ceph-block
+    resources:
+      requests:
+        memory: 80Gi
+        cpu: 4
+      limits:
+        memory: 80Gi
+        cpu: 4
+    metricsConfig:
+      enabled: true
+  kafkaExporter:
+    enabled: true
+    enableSaramaLogging: true
+    resources:
+      requests:
+        cpu: 200m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  users:
+    tsSalKafka:
+      enabled: true
+    kafdrop:
+      enabled: true
+    telegraf:
+      enabled: true
+    kafkaConnectManager:
+      enabled: true
+  registry:
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      hostname: tucson-teststand.lsst.codes
+      path: /schema-registry(/|$)(.*)
+  kraft:
+    enabled: true
+  kafkaController:
+    enabled: true
+    resources:
+      requests:
+        memory: 16Gi
+        cpu: "2"
+      limits:
+        memory: 16Gi
+        cpu: "2"
 
 influxdb:
   persistence:
@@ -26,17 +75,8 @@ influxdb:
     enabled: true
     hostname: tucson-teststand.lsst.codes
 
-influxdb2:
-  enabled: true
-  persistence:
-    storageClass: rook-ceph-block
-  ingress:
-    # -- InfluxDB2 ingress configuration
-    enabled: true
-    hostname: tucson-teststand.lsst.codes
-
 telegraf-kafka-consumer:
-  enabled: true
+  enabled: false
   kafkaConsumers:
     auxtel:
       enabled: true
@@ -57,7 +97,7 @@ telegraf-kafka-consumer:
     eas:
       enabled: true
       topicRegexps: |
-        [ ".*DIMM", ".*DSM", ".*ESS", ".*WeatherForecast" ]
+        [ ".*DIMM", ".*DSM", ".*EPM", ".*ESS", ".*WeatherForecast" ]
     latiss:
       enabled: true
       topicRegexps: |
@@ -81,22 +121,14 @@ telegraf-kafka-consumer:
       enabled: true
       topicRegexps: |
         [ ".*OCPS" ]
-    pmd:
-      enabled: true
-      topicRegexps: |
-        [ ".*PMD" ]
     calsys:
       enabled: true
       topicRegexps: |
-        [ ".*ATMonochromator", ".*ATWhiteLight", ".*CBP", ".*Electrometer", ".*FiberSpectrograph", ".*LinearStage", ".*TunableLaser" ]
+        [ ".*ATMonochromator", ".*ATWhiteLight", ".*CBP", ".*Electrometer", ".*FiberSpectrograph", ".*LEDProjector", ".*LinearStage", ".*MTReflector", ".*TunableLaser" ]
     mtaircompressor:
       enabled: true
       topicRegexps: |
         [ ".*MTAirCompressor" ]
-    authorize:
-      enabled: true
-      topicRegexps: |
-        [ ".*Authorize" ]
     lasertracker:
       enabled: true
       topicRegexps: |
@@ -129,7 +161,7 @@ kafka-connect-manager:
         topicsRegex: ".*CCCamera|.*CCHeaderService|.*CCOODS"
       eas:
         enabled: true
-        topicsRegex: ".*DIMM|.*DSM|.*ESS|.*WeatherForecast"
+        topicsRegex: ".*DIMM|.*DSM|.*EPM|.*ESS|.*WeatherForecast"
       latiss:
         enabled: true
         topicsRegex: ".*ATCamera|.*ATHeaderService|.*ATOODS|.*ATSpectrograph"
@@ -147,19 +179,13 @@ kafka-connect-manager:
         topicsRegex: ".*OCPS"
       test:
         enabled: true
-        topicsRegex: ".*Test"
-      pmd:
-        enabled: true
-        topicsRegex: ".*PMD"
+        topicsRegex: "lsst.sal.Test"
       calsys:
         enabled: true
-        topicsRegex: ".*ATMonochromator|.*ATWhiteLight|.*CBP|.*Electrometer|.*FiberSpectrograph|.*LinearStage|.*TunableLaser"
+        topicsRegex: ".*ATMonochromator|.*ATWhiteLight|.*CBP|.*Electrometer|.*FiberSpectrograph|.*LEDProjector|.*LinearStage|.*MTReflector|.*TunableLaser"
       mtaircompressor:
         enabled: true
         topicsRegex: ".*MTAirCompressor"
-      authorize:
-        enabled: true
-        topicsRegex: ".*Authorize"
       lasertracker:
         enabled: true
         topicsRegex: ".*LaserTracker"
@@ -168,6 +194,7 @@ kafka-connect-manager:
         topicsRegex: ".*GCHeaderService|.*GenericCamera"
 
 kafdrop:
+  cmdArgs: "--message.format=AVRO --message.keyFormat=DEFAULT --topic.deleteEnabled=false --topic.createEnabled=false"
   ingress:
     enabled: true
     hostname: tucson-teststand.lsst.codes
@@ -177,6 +204,8 @@ rest-proxy:
   ingress:
     enabled: true
     hostname: tucson-teststand.lsst.codes
+  configurationOverrides:
+    "access.control.allow.origin": https://tucson-teststand.lsst.codes/love
   kafka:
     topics:
       - test.next-visit

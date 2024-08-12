@@ -1,9 +1,28 @@
 strimzi-kafka:
+  kafka:
+    minInsyncReplicas: 1
+    listeners:
+      tls:
+        enabled: true
+      plain:
+        enabled: true
+      external:
+        enabled: true
+    config:
+      # -- Replica lag time can't be smaller than request.timeout.ms configuration in kafka connect.
+      replica.lag.time.max.ms: 120000
+
+  connect:
+    enabled: true
+    config:
+      # -- Increase the request timeout for Kafka Connect to 120 seconds
+      request.timeout.ms: 120000
+
   mirrormaker2:
     enabled: true
     source:
       bootstrapServer: sasquatch-summit-kafka-bootstrap.lsst.codes:9094
-      topicsPattern: "registry-schemas, lsst.sal.*, lsst.dm.*"
+      topicsPattern: "registry-schemas, lsst.sal.*, lsst.dm.*, lsst.backpack.*"
     resources:
       requests:
         cpu: 2
@@ -14,99 +33,228 @@ strimzi-kafka:
   users:
     replicator:
       enabled: true
+    kafdrop:
+      enabled: true
+    telegraf:
+      enabled: true
+    kafkaConnectManager:
+      enabled: true
+    promptProcessing:
+      enabled: true
+    consdb:
+      enabled: true
+  kraft:
+    enabled: true
+  kafkaController:
+    enabled: true
+  cruiseControl:
+    enabled: true
+  localStorage:
+    enabled: true
+    migration:
+      enabled: false
+      rebalance: false
+      brokers:
+        - 3
+        - 4
+        - 5
+    size: 1.5Ti
+    storageClassName: zfs--rubin-efd
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - sdfk8sn004
+                    - sdfk8sn005
+                    - sdfk8sn007
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: strimzi.io/cluster
+                  operator: In
+                  values:
+                    - sasquatch
+            topologyKey: kubernetes.io/hostname
 
 influxdb:
-  ingress:
-    enabled: true
-    hostname: usdf-rsp.slac.stanford.edu
-  persistence:
-    enabled: true
-    size: 15Ti
+  enabled: false
 
-source-influxdb:
+influxdb-enterprise:
   enabled: true
-  ingress:
-    enabled: true
-    hostname: usdf-rsp.slac.stanford.edu
-  persistence:
-    enabled: true
-    size: 15Ti
+  meta:
+    service:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/address-pool: sdf-services
+    ingress:
+      enabled: true
+      hostname: usdf-rsp.slac.stanford.edu
+    persistence:
+      # -- Enable InfluxDB Enterprise meta pod persistence
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 16Gi
+    # -- InfluxDB Enterprise meta pod resources
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 2
+      limits:
+        memory: 4Gi
+        cpu: 4
+  data:
+    replicas: 2
+    ingress:
+      enabled: true
+      hostname: usdf-rsp.slac.stanford.edu
+    # -- Enable InfluxDB Enterprise data pod persistence
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      storageClass: zfs--rubin-efd
+      size: 30Ti
+    # -- InfluxDB Enterprise data pod resources
+    resources:
+      requests:
+        memory: 192Gi
+        cpu: 8
+      limits:
+        memory: 192Gi
+        cpu: 8
 
-kafka-connect-manager:
+kafka-connect-manager-enterprise:
+  enabled: true
   influxdbSink:
-    # Based on the kafka producers configuration for the Summit
-    # https://github.com/lsst-ts/argocd-csc/blob/main/apps/kafka-producers/values-summit.yaml
+    connectInfluxUrl: "http://sasquatch-influxdb-enterprise-data.sasquatch:8086"
+    connectInfluxDb: "efd"
+    # Enable here the same connectors that are enabled at the summit to
+    # persist the same data at InfluxDB Enterprise at USDF
     connectors:
-      auxtel:
-        enabled: true
-        repairerConnector: false
-        topicsRegex: ".*ATAOS|.*ATDome|.*ATDomeTrajectory|.*ATHexapod|.*ATPneumatics|.*ATPtg|.*ATMCS"
-      maintel:
+      enterprise-maintel:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTAOS|.*MTDome|.*MTDomeTrajectory|.*MTPtg"
-      mtmount:
+      enterprise-mtmount:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTMount"
         tasksMax: "8"
-      comcam:
+      enterprise-comcam:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*CCCamera|.*CCHeaderService|.*CCOODS"
-      eas:
+      enterprise-eas:
         enabled: true
         repairerConnector: false
-        topicsRegex: ".*DIMM|.*DSM|.*ESS|.*HVAC|.*WeatherForecast|.*WeatherStation"
-      latiss:
-        enabled: true
-        repairerConnector: false
-        topicsRegex: ".*ATCamera|.*ATHeaderService|.*ATOODS|.*ATSpectrograph"
-      m1m3:
+        topicsRegex: ".*DIMM|.*DSM|.*EPM|.*ESS|.*HVAC|.*WeatherForecast"
+      enterprise-m1m3:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTM1M3"
         tasksMax: "8"
-      m2:
+      enterprise-m2:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTHexapod|.*MTM2|.*MTRotator"
-      obssys:
+      enterprise-obssys:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*Scheduler|.*Script|.*ScriptQueue|.*Watcher"
-      ocps:
+      enterprise-ocps:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*OCPS"
-      test:
-        enabled: true
-        repairerConnector: false
-        topicsRegex: ".*Test"
-      pmd:
+      enterprise-pmd:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*PMD"
-      calsys:
+      enterprise-calsys:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*ATMonochromator|.*ATWhiteLight|.*CBP|.*Electrometer|.*FiberSpectrograph|.*LinearStage|.*TunableLaser"
-      mtaircompressor:
+      enterprise-mtaircompressor:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*MTAirCompressor"
-      genericcamera:
+      enterprise-genericcamera:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*GCHeaderService|.*GenericCamera"
-      gis:
+      enterprise-gis:
         enabled: true
         repairerConnector: false
         topicsRegex: ".*GIS"
-      lasertracker:
+      enterprise-mtvms:
         enabled: true
         repairerConnector: false
-        topicsRegex: ".*LaserTracker"
+        topicsRegex: ".*MTVMS"
+      enterprise-lsstcam:
+        enabled: true
+        repairerConnector: false
+        topicsRegex: ".*MTCamera|.*MTHeaderService|.*MTOODS"
+
+telegraf-kafka-consumer:
+  enabled: true
+  influxdb:
+    url: "http://sasquatch-influxdb-enterprise-data.sasquatch:8086"
+  kafkaConsumers:
+    backpack:
+      enabled: true
+      replicaCount: 1
+      database: "lsst.backpack"
+      timestamp_format: "unix"
+      timestamp_field: "timestamp"
+      topicRegexps: |
+        [ "lsst.backpack" ]
+    auxtel:
+      enabled: true
+      database: "efd"
+      replicaCount: 1
+      interval: "1s"
+      flush_interval: "1s"
+      union_mode: "nullable"
+      timestamp_format: "unix"
+      timestamp_field: "private_efdStamp"
+      topicRegexps: |
+        [ "lsst.sal.ATAOS", "lsst.sal.ATDome", "lsst.sal.ATDomeTrajectory", "lsst.sal.ATHexapod", "lsst.sal.ATPneumatics", "lsst.sal.ATPtg", "lsst.sal.ATMCS" ]
+    latiss:
+      enabled: true
+      database: "efd"
+      replicaCount: 1
+      interval: "1s"
+      flush_interval: "1s"
+      union_mode: "nullable"
+      timestamp_format: "unix"
+      timestamp_field: "private_efdStamp"
+      topicRegexps: |
+        [ "lsst.sal.ATCamera", "lsst.sal.ATHeaderService", "lsst.sal.ATOODS", "lsst.sal.ATSpectrograph" ]
+    test:
+      enabled: true
+      database: "efd"
+      replicaCount: 1
+      interval: "1s"
+      flush_interval: "1s"
+      union_mode: "nullable"
+      timestamp_format: "unix"
+      timestamp_field: "private_efdStamp"
+      topicRegexps: |
+        [ "lsst.sal.Test" ]
+    lasertracker:
+      enabled: true
+      database: "efd"
+      replicaCount: 1
+      interval: "1s"
+      flush_interval: "1s"
+      union_mode: "nullable"
+      timestamp_format: "unix"
+      timestamp_field: "private_efdStamp"
+      topicRegexps: |
+        [ "lsst.sal.LaserTracker" ]
 
 kafdrop:
   ingress:
@@ -117,7 +265,6 @@ chronograf:
   ingress:
     enabled: true
     hostname: usdf-rsp.slac.stanford.edu
-
   env:
     GENERIC_NAME: "OIDC"
     GENERIC_AUTH_URL: https://usdf-rsp.slac.stanford.edu/auth/openid/login
@@ -129,3 +276,6 @@ chronograf:
     GENERIC_API_KEY: sub
     PUBLIC_URL: https://usdf-rsp.slac.stanford.edu/
     STATUS_FEED_URL: https://raw.githubusercontent.com/lsst-sqre/rsp_broadcast/main/jsonfeeds/usdfprod.json
+
+kapacitor:
+  influxURL: http://sasquatch-influxdb-enterprise-data.sasquatch:8086

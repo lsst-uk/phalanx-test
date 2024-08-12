@@ -11,7 +11,6 @@ config:
     clientId: "cilogon:/client_id/46f9ae932fd30e9fb1b246972a3c0720"
     enrollmentUrl: "https://id-dev.lsst.cloud/registry/co_petitions/start/coef:6"
     test: true
-    usernameClaim: "username"
 
   ldap:
     url: "ldaps://ldap-test.cilogon.org"
@@ -19,8 +18,11 @@ config:
     groupBaseDn: "ou=groups,o=LSST,o=CO,dc=lsst_dev,dc=org"
     groupObjectClass: "eduMember"
     groupMemberAttr: "hasMember"
+    groupSearchByDn: false
     userBaseDn: "ou=people,o=LSST,o=CO,dc=lsst_dev,dc=org"
     userSearchAttr: "voPersonApplicationUID"
+    uidAttr: null
+    gidAttr: null
     addUserGroup: true
 
   firestore:
@@ -29,6 +31,9 @@ config:
   # Support OpenID Connect clients like Chronograf.
   oidcServer:
     enabled: true
+
+  # Support generating user metadata for CADC authentication code.
+  cadcBaseUuid: "db8626e0-3b93-45c0-89ab-3058b0ed39fe"
 
   # User quota settings for services.
   quota:
@@ -39,8 +44,6 @@ config:
 
   groupMapping:
     "admin:jupyterlab":
-      - "g_admins"
-    "admin:provision":
       - "g_admins"
     "exec:admin":
       - "g_admins"
@@ -54,17 +57,19 @@ config:
       - "g_users"
     "read:tap":
       - "g_users"
+    "write:files":
+      - "g_users"
     "write:sasquatch":
       - "g_admins"
 
   initialAdmins:
     - "adam"
     - "afausti"
-    - "cbanek"
+    - "danfuchs"
     - "frossie"
     - "jsick"
     - "rra"
-    - "simonkrughoff"
+    - "svoutsin"
 
 cloudsql:
   enabled: true

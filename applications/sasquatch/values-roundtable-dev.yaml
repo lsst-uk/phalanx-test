@@ -34,36 +34,24 @@ strimzi-kafka:
         operator: Equal
         value: "kafka"
         effect: NoExecute
-
-  zookeeper:
-    replicas: 3
-    storage:
-      size: 100Gi
-      storageClassName: "premium-rwo"
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: "roundtable.lsst.cloud/pool"
-                  operator: In
-                  values:
-                    - "zookeeper"
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "strimzi.io/cluster"
-                  operator: "In"
-                  values:
-                    - "sasquatch"
-            topologyKey: "kubernetes.io/hostname"
-    tolerations:
-      - key: dedicated
-        operator: Equal
-        value: "zookeeper"
-        effect: NoExecute
-
+    resources:
+      requests:
+        memory: 16Gi
+        cpu: 2
+      limits:
+        memory: 16Gi
+        cpu: 2
+  kraft:
+    enabled: true
+  kafkaController:
+    enabled: true
+    resources:
+      requests:
+        memory: 8Gi
+        cpu: "2"
+      limits:
+        memory: 8Gi
+        cpu: "2"
   users:
     tsSalKafka:
       enabled: false
@@ -83,9 +71,6 @@ strimzi-kafka:
     enabled: false
 
 influxdb:
-  enabled: false
-
-influxdb2:
   enabled: false
 
 telegraf-kafka-consumer:

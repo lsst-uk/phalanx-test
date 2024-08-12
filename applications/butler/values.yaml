@@ -1,0 +1,93 @@
+# Default values for butler.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of web deployment pods to start
+replicaCount: 1
+
+image:
+  # -- Image to use in the butler deployment
+  repository: "ghcr.io/lsst/daf_butler"
+
+  # -- Pull policy for the butler image
+  pullPolicy: "IfNotPresent"
+
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+ingress:
+  # -- Additional annotations for the ingress rule
+  annotations: {}
+
+autoscaling:
+  # -- Enable autoscaling of butler deployment
+  enabled: false
+
+  # -- Minimum number of butler deployment pods
+  minReplicas: 1
+
+  # -- Maximum number of butler deployment pods
+  maxReplicas: 100
+
+  # -- Target CPU utilization of butler deployment pods
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Annotations for the butler deployment pod
+podAnnotations: {}
+
+# -- Resource limits and requests for the butler deployment pod
+# @default -- see `values.yaml`
+resources:
+  limits:
+    cpu: "1"
+    memory: "324Mi"
+  requests:
+    cpu: "15m"
+    memory: "150Mi"
+
+# -- Node selection rules for the butler deployment pod
+nodeSelector: {}
+
+# -- Tolerations for the butler deployment pod
+tolerations: []
+
+# -- Affinity rules for the butler deployment pod
+affinity: {}
+
+# The following will be set by parameters injected by Argo CD and should not
+# be set in the individual environment values files.
+global:
+  # -- Base URL for the environment
+  # @default -- Set by Argo CD
+  baseUrl: ""
+
+  # -- Host name for ingress
+  # @default -- Set by Argo CD
+  host: ""
+
+  # -- Base path for Vault secrets
+  # @default -- Set by Argo CD
+  vaultSecretsPath: ""
+
+config:
+  # -- Mapping from Butler repository label to Butler configuration URI for
+  # repositories which will be hosted by this server.
+  repositories: {}
+
+  # -- Postgres connection string pointing to the registry database hosting
+  # Data Preview 0.2 data.
+  # @default -- No configuration file for DP02 will be generated.
+  dp02PostgresUri: ""
+
+  # -- Postgres username used to connect to the Butler DB
+  # @default -- Use values specified in per-repository Butler config files.
+  pguser: ""
+
+  # -- URL for the S3 service where files for datasets are stored by Butler.
+  s3EndpointUrl: ""
+
+  # -- The prefix of the path portion of the URL where the Butler service will
+  # be exposed.  For example, if the service should be exposed at
+  # `https://data.lsst.cloud/api/butler`, this should be set to `/api/butler`
+  pathPrefix: "/api/butler"

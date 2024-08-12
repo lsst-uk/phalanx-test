@@ -3,9 +3,40 @@ kind: Kafka
 metadata:
   name: {{ .Values.cluster.name }}
 spec:
+  {{- if .Values.kafkaExporter.enabled }}
+  kafkaExporter:
+    groupRegex: {{ .Values.kafkaExporter.groupRegex }}
+    topicRegex: {{ .Values.kafkaExporter.topicRegex }}
+    enableSaramaLogging: {{ .Values.kafkaExporter.enableSaramaLogging }}
+    logging: {{ .Values.kafkaExporter.logLevel }}
+    template:
+      deployment:
+        metadata:
+          annotations:
+            prometheus.io/scrape: 'true'
+      pod:
+        metadata:
+          annotations:
+            prometheus.io/scrape: 'true'
+  {{- end }}
+
   kafka:
+    {{- if .Values.kafka.prometheusScrapingEnabled }}
+    template:
+      pod:
+        metadata:
+          annotations:
+            prometheus.io/scrape: 'true'
+    {{- end }}
     version: {{ .Values.kafka.version }}
     replicas: {{ .Values.kafka.replicas }}
+    resources:
+      requests:
+        memory: 16Gi
+        cpu: "4"
+      limits:
+        memory: 32Gi
+        cpu: "8"
     listeners:
       - name: internal
         port: 9092
@@ -46,8 +77,10 @@ spec:
             {{- if .Values.kafka.externalListener.bootstrap.ip }}
             loadBalancerIP: {{ .Values.kafka.externalListener.bootstrap.ip }}
             {{- end }}
-            {{- if .Values.kafka.externalListener.bootstrap.annotations }}
-            annotations: {{ .Values.kafka.externalListener.bootstrap.annotations }}
+
+            {{- with .Values.kafka.externalListener.bootstrap.annotations }}
+            annotations:
+              {{- toYaml . | nindent 14 }}
             {{- end }}
 
           {{- if .Values.kafka.externalListener.brokers }}
@@ -56,6 +89,7 @@ spec:
             - broker: {{ $idx }}
               loadBalancerIP: {{ $broker.ip }}
               advertisedHost: {{ $broker.host }}
+              annotations: {{ toYaml $broker.annotations | nindent 16 }}
             {{- end }}
           {{- end }}
 
@@ -79,6 +113,7 @@ spec:
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
+      message.max.bytes: 4194304 # 8 Megabytes. For testing purposes only.
       log.message.format.version: {{ .Values.kafka.logMessageFormatVersion }}
       inter.broker.protocol.version: {{ .Values.kafka.interBrokerProtocolVersion }}
       ssl.client.auth: required
@@ -123,6 +158,17 @@ spec:
                         values: [{{ $affinity.value }}]
               {{- end }}
         {{- end }}
+
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key:  "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                    - kafka
+              topologyKey: "kubernetes.io/hostname"
 
   zookeeper:
     replicas: {{ .Values.zookeeper.replicas }}

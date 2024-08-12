@@ -1,0 +1,15 @@
+apiVersion: v2
+name: control-system-test
+version: 1.0.0
+description: Deployment for the Test CSCs and Integration Testing Workflows
+dependencies:
+- name: csc_shared
+  version: 1.0.0
+  repository: file://../../charts/csc_shared
+- name: csc
+  alias: test42
+  version: 1.0.0
+  repository: file://../../charts/csc
+- name: integration-testing
+  version: 1.0.0
+  condition: integration-testing.enabled
