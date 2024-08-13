@@ -2,7 +2,7 @@ name: "rsptest"
 fqdn: "rsp-test.lsst.ac.uk"
 appOfAppsName: "science-platform"
 vaultUrl: "https://vault.lsst.ac.uk"
-vaultPathPrefix: secret/k8s_operator/rsptest_test
+vaultPathPrefix: kv-v2/k8s_operator/rsptest
 
 applications:
   mobu: true
