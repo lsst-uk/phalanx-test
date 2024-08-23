@@ -6,7 +6,7 @@ vaultPathPrefix: kv-v2/k8s_operator/rsptest
 
 applications:
   cert-manager: false
-  ingress-nginx: true
+  # ingress-nginx: true
   mobu: true
   nublado: true
   portal: true
