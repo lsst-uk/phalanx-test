@@ -5,7 +5,7 @@ vaultUrl: "https://vault.lsst.ac.uk"
 vaultPathPrefix: kv-v2/k8s_operator/rsptest
 
 applications:
-  cert-manager: false
+  # cert-manager: false
   # ingress-nginx: true
   mobu: true
   nublado: true
